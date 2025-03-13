@@ -1,25 +1,95 @@
 # LumeNN
 
-**LumeNN** is a neural network that solves problems of binary and multi-class classification of stellar luminosity.
+**LumeNN** — это нейронная сеть, которая решает проблему бинарное и многоклассовой
+классификации переменных звёзд.
 
 
-## Binary classification
+# Бинарная классификация
 
-### Dataset
+## Набор данных
 
-Dataset was extracted from **ATLAS-REFCAT2** catalog by using [TAPVizieR](https://tapvizier.cds.unistra.fr/adql)
-webservice.
+Набор данных взят из xmatch посрдеством слиянии каталогов апас и галекс. Затем просеян через vsx
+с выведением типа звезд (переменная или постоянная). Далее датасет был отчищен:
+- удалео 512 строк с ошибкой более 1,
+- удалена колонка type, ибо она заполнена менее, чем на 10%,
+- удалены 4 строки без данных о минимальной и максимальной магнитудах (min_mag, max_mag).
 
-[Full dataset](https://archive.stsci.edu/hlsp/atlas-refcat2) has almost 1 billion entries 
-(*992637834* to be exact), which is way too much to process.
-[TAPVizieR](https://tapvizier.cds.unistra.fr/adql) allowed to query only those entries,
-who have **dupvar** (star luminosity) set to *2* (constant) or *1* (variable).
+Но в полученных данных ещё есть проблема с разделением на классы:
 
-Research was done on *200000* dataset with *100000* samples of stars with constant luminosity
-and *100000* samples of stars with variable luminosity.
-You can see those samples in [stellardata.sqlite](./data/stellardata.sqlite) database
-in the **binary_classification** table.
+![Разделение на классы в полученных данных](img/origin_data_present_diagram.png)
 
-'Clean up' of data was also performed - columns were renamed, types fixed, `NULL`s added.
-[Here](https://vizier.cds.unistra.fr/viz-bin/VizieR-3?-source=J/ApJ/867/105/refcat2) you can see
-extensive information about initial state of the dataset.
+Мы эту проблему пробовали решать двумя разными способами:
+
+- Взвешивание классов
+- Увеличение (Oversampling) и уменьшение (Undersampling) выборки
+
+## Решение с помощью встроенных в scikit-learn моделей
+
+### Логистическая регрессия
+
+![Confusion matrix](img/cm_log_reg_wc.png)
+
+Accuracy:  0.6071964017991005 \
+Precision:  0.1360071988687492 \
+Recall:  0.5467700258397933 \
+F1 score:  0.21782993617459337
+
+### Случайный лес - default parameters
+
+![Confusion matrix](img/cm_random_forest_wc.png)
+
+Accuracy:  0.9359975184821382\
+Precision:  0.8842337375964718\
+Recall:  0.4144702842377261\
+F1 score:  0.5643912737508796
+
+### Случайный лес - max_deph = 5, random_state=42
+
+![Confusion matrix](img/cm_random_forest2_wc.png)
+
+Accuracy:  0.7240345344569095\
+Precision:  0.25548931220008725\
+**Recall:  0.889620253164557**\
+F1 score:  0.39697243560777223
+
+Большое значение метрики Recall говорит нам о том, что модель смогла выявить большую
+часть переменных звёзд из всех реально переменных. Хотя процент ложных срабатываний
+удручает.
+
+### SGDClassifier
+
+loss: modified_huber
+
+![Confusion matrix](img/cm_SGD_wc.png)
+
+Accuracy:  0.8872460321563356\
+Precision:  0.24120603015075376\
+Recall:  0.04860759493670886\
+F1 score:  0.08091024020227561\
+
+### Gradient Boosting
+
+Так как у градиентного бустинга в sklearn отсутствует возможность задать веса
+классам, к выборке был применен undersampling.
+
+#### default parameters
+
+![Confusion matrix](img/cm_gb0_us.png)
+
+Accuracy:  0.8514724711907811\
+Precision:  0.8129858253315043\
+Recall:  0.9122626988199076\
+F1 score:  0.8597678916827853
+
+#### max_depth = 10
+
+![Confusion matrix](img/cm_gb1_us.png)
+
+Accuracy:  0.9144686299615877\
+Precision:  0.8742374472078837\
+Recall:  0.9657853810264385\
+F1 score:  0.9177339901477832
+
+## Выводы
+
+Практически по всем метрикам лучше всего показала себя градиентный бустинг.
