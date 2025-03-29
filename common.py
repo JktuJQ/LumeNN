@@ -5,6 +5,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+import os
+
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+import keras
+
 from sklearn.model_selection import train_test_split
 
 from sklearn.utils.class_weight import compute_class_weight
@@ -24,17 +29,27 @@ class Model(t.Protocol):
         pass
 
 
+NEURAL_NETWORK_EPOCHS = 30
+NEURAL_NETWORK_OPTIMIZER = keras.optimizers.Adam(keras.optimizers.schedules.ExponentialDecay(
+    1e-4,
+    decay_steps=1000,
+    decay_rate=0.001,
+    staircase=True)
+)
+NEURAL_NETWORK_LOSS = keras.losses.BinaryCrossentropy(label_smoothing=0.2)
+
+
 # Data
+def undersample(x_data: pd.DataFrame, y_data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Undersamples data on the `y_data` parameter."""
+    return RandomUnderSampler().fit_resample(x_data, y_data)
+
+
 def train_test_split_data(x_data: pd.DataFrame, y_data: pd.DataFrame, train_test_ratio=0.3) \
         -> tuple[tuple[pd.DataFrame, pd.DataFrame], tuple[pd.DataFrame, pd.DataFrame]]:
     """Takes data and splits it into random train and test subsets."""
     x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=train_test_ratio)
     return (x_train, y_train), (x_test, y_test)
-
-
-def undersample(x_data: pd.DataFrame, y_data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Undersamples data on the `y_data` parameter."""
-    return RandomUnderSampler().fit_resample(x_data, y_data)
 
 
 # Binary classification data
@@ -44,18 +59,13 @@ BINARY_CLASSIFICATION_DATA: pd.DataFrame = pd.read_csv("data/binary_classificati
 BINARY_CLASSIFICATION_X: pd.DataFrame = BINARY_CLASSIFICATION_DATA.drop(BINARY_CLASSIFICATION_LABEL, axis=1)
 BINARY_CLASSIFICATION_Y: pd.DataFrame = BINARY_CLASSIFICATION_DATA[BINARY_CLASSIFICATION_LABEL]
 
-((BINARY_CLASSIFICATION_X_TRAIN, BINARY_CLASSIFICATION_Y_TRAIN),
- (BINARY_CLASSIFICATION_X_TEST, BINARY_CLASSIFICATION_Y_TEST)) = \
-    (BINARY_CLASSIFICATION_TRAIN_DATA, BINARY_CLASSIFICATION_TEST_DATA) = \
-    train_test_split_data(BINARY_CLASSIFICATION_X, BINARY_CLASSIFICATION_Y)
-
 CLASS_WEIGHTS = dict(zip([0, 1],
                          compute_class_weight("balanced",
                                               classes=BINARY_CLASSIFICATION_Y.unique(),
                                               y=BINARY_CLASSIFICATION_Y)[::-1]))
 
 
-def plot_variable_ratio(data, save_plot=False):
+def plot_variable_ratio(data, save_plot=False) -> None:
     """Plots ratio between variable stars and non-variable stars."""
     sns.countplot(x=BINARY_CLASSIFICATION_LABEL, data=data, palette='hls')
     plt.show()
@@ -63,7 +73,8 @@ def plot_variable_ratio(data, save_plot=False):
         plt.savefig("binary_classification_variable_ratio.png")
 
 
-def test_binary_classifier(classifier: Model, x_test_data: t.Any, y_test_data: t.Any, save_plot=False) \
+def test_binary_classifier(classifier: Model, x_test_data: t.Any, y_test_data: t.Any,
+                           save_plot: t.Union[bool, str] = False) \
         -> t.Dict[str, float]:
     """Tests binary classifier by creating confusion matrix and recording metrics."""
     y_predicted = classifier.predict(x_test_data)
@@ -73,7 +84,8 @@ def test_binary_classifier(classifier: Model, x_test_data: t.Any, y_test_data: t
     plt.title("Confusion matrix")
     plt.show()
     if save_plot:
-        plt.savefig("confusion_matrix_" + type(classifier).__name__ + ".png")
+        plt.savefig("img/confusion_matrix_" + type(classifier).__name__ + (
+            "" if isinstance(save_plot, str) else save_plot) + ".png")
 
     return record_metrics(y_test_data, y_predicted)
 
