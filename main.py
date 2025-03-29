@@ -52,7 +52,7 @@ def main(argv: t.List[str]) -> None:
             save_plot = input(
                 "Do you want to save plot to file (write filename identifier or leave it blank otherwise)?\n")
             if save_plot:
-                recorded_metrics = common.test_binary_classifier(classifier, *test_data, save_plot="_" + save_plot)
+                recorded_metrics = common.test_binary_classifier(classifier, *test_data, save_plot=save_plot)
             else:
                 recorded_metrics = common.test_binary_classifier(classifier, *test_data)
             print()

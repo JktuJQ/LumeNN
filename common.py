@@ -29,14 +29,13 @@ class Model(t.Protocol):
         pass
 
 
-NEURAL_NETWORK_EPOCHS = 30
+NEURAL_NETWORK_EPOCHS = 10
 NEURAL_NETWORK_OPTIMIZER = keras.optimizers.Adam(keras.optimizers.schedules.ExponentialDecay(
     1e-4,
     decay_steps=1000,
-    decay_rate=0.001,
-    staircase=True)
-)
-NEURAL_NETWORK_LOSS = keras.losses.BinaryCrossentropy(label_smoothing=0.2)
+    decay_rate=0.0001
+))
+NEURAL_NETWORK_LOSS = keras.losses.BinaryFocalCrossentropy(label_smoothing=0.2)
 
 
 # Data
@@ -70,7 +69,7 @@ def plot_variable_ratio(data, save_plot=False) -> None:
     sns.countplot(x=BINARY_CLASSIFICATION_LABEL, data=data, palette='hls')
     plt.show()
     if save_plot:
-        plt.savefig("binary_classification_variable_ratio.png")
+        plt.savefig("docs/images/binary_classification_variable_ratio.png")
 
 
 def test_binary_classifier(classifier: Model, x_test_data: t.Any, y_test_data: t.Any,
@@ -82,10 +81,11 @@ def test_binary_classifier(classifier: Model, x_test_data: t.Any, y_test_data: t
     cm = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix(y_test_data, y_predicted), display_labels=[0, 1])
     cm.plot(cmap=plt.cm.Blues)
     plt.title("Confusion matrix")
-    plt.show()
     if save_plot:
-        plt.savefig("img/confusion_matrix_" + type(classifier).__name__ + (
-            "" if isinstance(save_plot, str) else save_plot) + ".png")
+        print()
+        plt.savefig("docs/images/cm_" + str(type(classifier).__name__).lower() + (
+            save_plot if isinstance(save_plot, str) else "") + ".png")
+    plt.show()
 
     return record_metrics(y_test_data, y_predicted)
 
