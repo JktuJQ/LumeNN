@@ -2,7 +2,9 @@ import sys
 import typing as t
 
 import common
-import binary_classification as bc
+
+import binary_classification.data as bd
+import binary_classification.classifiers as bc
 
 
 def main(argv: t.List[str]) -> None:
@@ -20,7 +22,7 @@ def main(argv: t.List[str]) -> None:
                 'SGD' ('4'),
                 'gradient boosting with default parameters' ('5'),
                 'gradient boosting with configured parameters' ('6'),
-                'neural network configuration' ('7')\n"""))
+                'neural network that emulates logistic regression' ('7')\n"""))
             if classifier_id == 1:
                 classifier = bc.LOGISTIC_REGRESSION
             elif classifier_id == 2:
@@ -34,17 +36,17 @@ def main(argv: t.List[str]) -> None:
             elif classifier_id == 6:
                 classifier = bc.CONFIGURED_GRADIENT_BOOSTING
             elif classifier_id == 7:
-                classifier = bc.NN_MODEL
+                classifier = bc.NN_LOGISTIC_REGRESSION
             else:
                 print("Wrong input - there is no classifier with code " + str(classifier_id))
                 continue
 
             print()
             ratio = input("You can change ratio of train and test dataset or leave blank to use default.\n")
-            train_data, test_data = common.train_test_split_data(common.BINARY_CLASSIFICATION_X,
-                                                                 common.BINARY_CLASSIFICATION_Y,
+            train_data, test_data = common.train_test_split_data(bd.BINARY_CLASSIFICATION_X,
+                                                                 bd.BINARY_CLASSIFICATION_Y,
                                                                  train_test_ratio=float(ratio) if ratio else 0.3)
-            if classifier_id in (5, 6, 7):
+            if classifier_id in (5, 6):
                 train_data = common.undersample(*train_data)
             classifier.fit(*train_data)
 
@@ -52,11 +54,17 @@ def main(argv: t.List[str]) -> None:
             save_plot = input(
                 "Do you want to save plot to file (write filename identifier or leave it blank otherwise)?\n")
             if save_plot:
-                recorded_metrics = common.test_binary_classifier(classifier, *test_data, save_plot=save_plot)
+                recorded_metrics = bd.test_binary_classifier(classifier, *test_data, save_plot=save_plot)
             else:
-                recorded_metrics = common.test_binary_classifier(classifier, *test_data)
+                recorded_metrics = bd.test_binary_classifier(classifier, *test_data)
+
             print()
-            print("Recorded metrics: " + str(recorded_metrics))
+            record_metrics = input(
+                "Do you want to record metrics in a file (write filename or leave it blank otherwise)?\n")
+            if record_metrics:
+                with open(record_metrics, mode="a") as f:
+                    f.write(str(recorded_metrics) + "\n")
+            print()
         elif classification_type == "m":
             raise "Not yet implemented"
         else:
