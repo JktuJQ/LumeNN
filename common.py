@@ -18,7 +18,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 # Model
 class NNHyperparameters:
-    """`NNHyperparameters` holds all """
+    """`NNHyperparameters` holds all parameters of neural network."""
 
     def __init__(self, epochs: int, optimizer: t.Any, loss: t.Any):
         self.epochs = epochs
