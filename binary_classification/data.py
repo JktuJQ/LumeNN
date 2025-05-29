@@ -7,6 +7,8 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 BINARY_CLASSIFICATION_LABEL: str = "variable"
 
 BINARY_CLASSIFICATION_DATA: pd.DataFrame = pd.read_csv("datasets/binary_classification_stellar_data.csv")
+BINARY_CLASSIFICATION_DATA = BINARY_CLASSIFICATION_DATA.drop(["N"], axis=1)
+
 BINARY_CLASSIFICATION_X: pd.DataFrame = BINARY_CLASSIFICATION_DATA.drop(BINARY_CLASSIFICATION_LABEL, axis=1)
 BINARY_CLASSIFICATION_Y: pd.DataFrame = BINARY_CLASSIFICATION_DATA[BINARY_CLASSIFICATION_LABEL]
 

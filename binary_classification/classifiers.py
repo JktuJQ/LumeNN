@@ -14,7 +14,7 @@ CONFIGURED_RANDOM_FOREST = RandomForestClassifier(n_estimators=100, max_depth=5,
                                                   class_weight=CLASS_WEIGHTS)
 SGD = SGDClassifier(loss='modified_huber', class_weight=CLASS_WEIGHTS)
 DEFAULT_GRADIENT_BOOSTING = GradientBoostingClassifier()
-CONFIGURED_GRADIENT_BOOSTING = GradientBoostingClassifier(n_estimators=150, max_depth=15)
+CONFIGURED_GRADIENT_BOOSTING = GradientBoostingClassifier(max_depth=10)
 
 
 class NNClassifier:
@@ -46,6 +46,25 @@ NN_LOGISTIC_REGRESSION = NNClassifier(
                       )
                       ),
     keras.Sequential([
+        keras.layers.Dense(1, keras.activations.sigmoid)
+    ])
+)
+
+NN_CLASSIFIER = NNClassifier(
+    NNHyperparameters(16,
+                      keras.optimizers.Adam(learning_rate=keras.optimizers.schedules.ExponentialDecay(
+                          1e-2,
+                          decay_steps=15000,
+                          decay_rate=0.01
+                      )),
+                      keras.losses.BinaryFocalCrossentropy(
+                          apply_class_balancing=True, alpha=(1 - CLASS_WEIGHTS[0] / CLASS_WEIGHTS[1]),
+                          gamma=1.0
+                      )
+                      ),
+    keras.Sequential([
+        keras.layers.Dense(1024, keras.activations.mish),
+        keras.layers.Dense(128, keras.activations.hard_shrink),
         keras.layers.Dense(1, keras.activations.sigmoid)
     ])
 )
