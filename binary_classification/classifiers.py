@@ -10,11 +10,10 @@ from sklearn.ensemble import GradientBoostingClassifier
 
 LOGISTIC_REGRESSION = LogisticRegression(class_weight=CLASS_WEIGHTS)
 DEFAULT_RANDOM_FOREST = RandomForestClassifier(class_weight=CLASS_WEIGHTS)
-CONFIGURED_RANDOM_FOREST = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=42,
-                                                  class_weight=CLASS_WEIGHTS)
+CONFIGURED_RANDOM_FOREST = RandomForestClassifier(max_depth=11, class_weight=CLASS_WEIGHTS)
 SGD = SGDClassifier(loss='modified_huber', class_weight=CLASS_WEIGHTS)
 DEFAULT_GRADIENT_BOOSTING = GradientBoostingClassifier()
-CONFIGURED_GRADIENT_BOOSTING = GradientBoostingClassifier(max_depth=10)
+CONFIGURED_GRADIENT_BOOSTING = GradientBoostingClassifier(max_depth=13)
 
 
 class NNClassifier:
