@@ -4,16 +4,19 @@ from binary_classification.data import CLASS_WEIGHTS
 import keras
 
 from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 
-LOGISTIC_REGRESSION = LogisticRegression(class_weight=CLASS_WEIGHTS)
-DEFAULT_RANDOM_FOREST = RandomForestClassifier(class_weight=CLASS_WEIGHTS)
-CONFIGURED_RANDOM_FOREST = RandomForestClassifier(max_depth=11, class_weight=CLASS_WEIGHTS)
-SGD = SGDClassifier(loss='modified_huber', class_weight=CLASS_WEIGHTS)
-DEFAULT_GRADIENT_BOOSTING = GradientBoostingClassifier()
-CONFIGURED_GRADIENT_BOOSTING = GradientBoostingClassifier(max_depth=13)
+
+LOGISTIC_REGRESSION_CLASSIFIER = LogisticRegression(class_weight=CLASS_WEIGHTS)
+SVC_CLASSIFIER = SVC(class_weight=CLASS_WEIGHTS)
+KNN_CLASSIFIER = KNeighborsClassifier()
+RANDOM_FOREST_CLASSIFIER = RandomForestClassifier(max_depth=11, class_weight=CLASS_WEIGHTS)
+SGD_CLASSIFIER = SGDClassifier(loss='modified_huber', class_weight=CLASS_WEIGHTS)
+GRADIENT_BOOSTING_CLASSIFIER = GradientBoostingClassifier(max_depth=13)
 
 
 class NNClassifier:
@@ -32,7 +35,7 @@ class NNClassifier:
         self.classifier.fit(x_data.to_numpy(), y_data.to_numpy(), epochs=self.hyperparameters.epochs)
 
 
-NN_LOGISTIC_REGRESSION = NNClassifier(
+NN_LOGISTIC_REGRESSION_CLASSIFIER = NNClassifier(
     NNHyperparameters(50,
                       keras.optimizers.Adam(learning_rate=keras.optimizers.schedules.ExponentialDecay(
                           1e-2,
