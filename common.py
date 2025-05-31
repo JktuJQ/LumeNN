@@ -2,9 +2,6 @@ import typing as t
 
 import pandas as pd
 
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 import keras
@@ -12,8 +9,6 @@ import keras
 from sklearn.model_selection import train_test_split
 
 from imblearn.under_sampling import RandomUnderSampler
-
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 
 # Model
@@ -52,18 +47,3 @@ def train_test_split_data(x_data: pd.DataFrame, y_data: pd.DataFrame, train_test
 
     x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=train_test_ratio)
     return (x_train, y_train), (x_test, y_test)
-
-
-# Metrics
-METRICS: t.Dict[str, t.Callable[[pd.DataFrame, pd.DataFrame], float]] = {
-    "accuracy": accuracy_score,
-    "precision": precision_score,
-    "recall": recall_score,
-    "F1": f1_score
-}
-
-
-def record_metrics(y_true: pd.DataFrame, y_predicted: pd.DataFrame) -> t.Dict[str, float]:
-    """Records all metrics that are in the `metrics` dictionary and returns dictionary with results."""
-
-    return {metric_name: metric_fn(y_true, y_predicted) for (metric_name, metric_fn) in METRICS.items()}

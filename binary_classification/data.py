@@ -2,7 +2,10 @@ from common import *
 
 from sklearn.utils.class_weight import compute_class_weight
 
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, classification_report
+
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 BINARY_CLASSIFICATION_LABEL: str = "variable"
 
@@ -19,24 +22,21 @@ CLASS_WEIGHTS: t.Dict[int, float] = dict(zip([0, 1],
                                                                   y=BINARY_CLASSIFICATION_Y)[::-1]))
 
 
-def plot_variable_ratio(data, save_plot=False) -> None:
+def plot_variable_ratio(save_plot=False) -> None:
     """Plots ratio between variable stars and non-variable stars."""
 
-    sns.countplot(x=BINARY_CLASSIFICATION_LABEL, data=data, palette=sns.hls_palette(8)[0:3:2])
+    sns.countplot(x=BINARY_CLASSIFICATION_LABEL, y=BINARY_CLASSIFICATION_Y, palette=sns.hls_palette(8)[0:3:2])
     if save_plot:
         plt.savefig("binary_classification/docs/images/variable_ratio.png")
     plt.show()
 
 
-def test_binary_classifier(classifier: Model, x_test_data: t.Any, y_test_data: t.Any,
-                           save_plot: t.Union[bool, str] = False) \
-        -> t.Dict[str, float]:
+def test_binary_classifier(classifier: Model, x_test_data: t.Any, y_test_data: t.Any, save_plot: t.Union[bool, str] = False):
     """Tests binary classifier by creating confusion matrix and recording metrics."""
 
     y_predicted = classifier.predict(x_test_data)
 
-    metrics = record_metrics(y_test_data, y_predicted)
-    print("Recorded metrics: ", metrics)
+    print("Recorded metrics:\n", classification_report(y_test_data, y_predicted))
 
     cm = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix(y_test_data, y_predicted), display_labels=[0, 1])
     cm.plot(cmap=plt.cm.Blues)
@@ -46,5 +46,3 @@ def test_binary_classifier(classifier: Model, x_test_data: t.Any, y_test_data: t
         plt.savefig("binary_classification/docs/images/cm_" + str(type(classifier).__name__).lower() + (
             save_plot if isinstance(save_plot, str) else "") + ".png")
     plt.show()
-
-    return metrics

@@ -11,11 +11,11 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 
 
-LOGISTIC_REGRESSION_CLASSIFIER = LogisticRegression(class_weight=CLASS_WEIGHTS)
-SVC_CLASSIFIER = SVC(class_weight=CLASS_WEIGHTS)
+LOGISTIC_REGRESSION_CLASSIFIER = LogisticRegression(class_weight="balanced")
+SVC_CLASSIFIER = SVC(class_weight="balanced")
 KNN_CLASSIFIER = KNeighborsClassifier()
-RANDOM_FOREST_CLASSIFIER = RandomForestClassifier(max_depth=11, class_weight=CLASS_WEIGHTS)
-SGD_CLASSIFIER = SGDClassifier(loss='modified_huber', class_weight=CLASS_WEIGHTS)
+RANDOM_FOREST_CLASSIFIER = RandomForestClassifier(max_depth=11, class_weight="balanced")
+SGD_CLASSIFIER = SGDClassifier(loss='modified_huber', class_weight="balanced")
 GRADIENT_BOOSTING_CLASSIFIER = GradientBoostingClassifier(max_depth=13)
 
 

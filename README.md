@@ -123,7 +123,7 @@
 
 ##### Случайный лес (параметры: `max_depth = 11`); взвешивание классов
 
-![Confusion matrix for configured random forest](binary_classification/docs/images/cm_random_forest_configured.png)
+![Confusion matrix for configured random forest](binary_classification/docs/images/cm_random_forest.png)
 
 | Accuracy | Precision | Recall | F1-score |
 |:--------:|:---------:|:------:|:--------:|
@@ -131,7 +131,7 @@
 
 ##### `SGDClassifier` (функция потерь `modified_huber`); взвешивание классов
 
-![Confusion matrix for `SGDClassifier`](binary_classification/docs/images/cm_SGD.png)
+![Confusion matrix for `SGDClassifier`](binary_classification/docs/images/cm_sgd.png)
 
 | Accuracy | Precision | Recall | F1-score |
 |:--------:|:---------:|:------:|:--------:|
@@ -147,7 +147,7 @@
 
 ##### Градиентный бустинг (параметры: `max_depth=13`); уменьшение выборки
 
-![Confusion matrix for configured gradient boosting](binary_classification/docs/images/cm_gradient_boosting_configured.png)
+![Confusion matrix for configured gradient boosting](binary_classification/docs/images/cm_gradient_boosting.png)
 
 | Accuracy | Precision | Recall | F1-score |
 |:--------:|:---------:|:------:|:--------:|
@@ -194,7 +194,7 @@
 |:---------------:|:-----------:|:----------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------:|
 |       24        |   `Adam`    | `keras.optimizers.schedules.ExponentialDecay(1e-2, decay_steps=15000, decay_rate=0.01))` | `BinaryFocalCrossentropy(apply_class_balancing=True, alpha=0.9, gamma=1.0)` |
 
-![Confusion matrix for best neural network classifier](binary_classification/docs/images/cm_nnclassifierbest.png)
+![Confusion matrix for best neural network classifier](binary_classification/docs/images/cm_nnclassifier.png)
 
 | Accuracy | Precision | Recall | F1-score |
 |:--------:|:---------:|:------:|:--------:|
