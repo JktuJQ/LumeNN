@@ -1,233 +1,403 @@
-# LumeNN
+# 🌟**LumeNN**🌟
 
-**LumeNN** — приложение, решающее проблему **бинарной** и **многоклассовой**
-классификации звёзд переменной светимости, используя различные модели машинного обучения.
+**LumeNN** is an application that addresses the problem of **binary** and **multiclass** classification
+of variable stars using various machine learning models.
 
-## Актуальность исследования
+## Relevance of the Study
 
-В связи с тем, что к данному моменту накопилось значительное количество данных космических наблюдений,
-которые могут иметь большую ценность для астрономии и астрофизики, необходимо разработать метод,
-позволяющий эффективно и точно идентифицировать звезды переменной светимости среди этих небесных тел.
-Данная разработка может помочь ученым не проверять вручную все эти наблюдения,
-а сфокусировать свое внимание только на отобранных.
+Given the significant accumulation of astronomical observation data,
+which holds great value for astronomy and astrophysics,
+there is a need to develop a method for efficiently and accurately identifying variable stars
+among these celestial objects.
+This tool can help scientists avoid manually verifying all observations and
+instead focus only on the selected candidates.
 
-## Бинарная классификация
+## Dataset
 
-### Набор данных
+The dataset was obtained by merging catalogs from [APASS](https://www.aavso.org/apass)
+and [GALEX](https://galex.stsci.edu/GR6/)
+using [X-Match](http://cdsxmatch.u-strasbg.fr/)
+and filtering the results with [VSX](https://www.aavso.org/vsx/).
 
-Набор данных получен посредством слияния каталогов [APASS](https://www.aavso.org/apass)
-и [GALEX](https://galex.stsci.edu/GR6/) в [X-Match](http://cdsxmatch.u-strasbg.fr/)
-и просеивания полученного через [VSX](https://www.aavso.org/vsx/).
+## Binary Classification
 
-#### Обработка данных
+### Data Processing
 
-Для обработки данных необходимо принять во внимание значение характеристик
-небесных тел из нашего набора данных:
+When processing the data, the following features of celestial objects must be considered:
 
-- `RAJ2000` — прямое восхождение звезды в эпохе J2000 (в градусах)
-- `DEJ2000` — склонение звезды в эпохе J2000 (в градусах)
-- `nobs` — количество наблюдений звезды
-- `Vmag` — видимая звёздная величина в V-фильтре (оптический диапазон)
-- `e_Vmag` — ошибка измерения `Vmag`
-- `Bmag` — видимая звёздная величина в B-фильтре (синий диапазон)
-- `e_Bmag` — ошибка измерения `Bmag`
-- `gpmag` — видимая звёздная величина в фильтре Gaia G (данные от космического телескопа Gaia)
-- `e_gpmag` — ошибка измерения `gpmag`
-- `rpmag` — видимая звёздная величина в фильтре Gaia RP (красный диапазон, данные Gaia)
-- `e_rpmag` — ошибка измерения `rpmag`
-- `ipmag` — видимая звёздная величина в I-фильтре (ближний инфракрасный диапазон)
-- `e_ipmag` — ошибка измерения `ipmag`
-- `fuv_mag` — видимая звёздная величина в ультрафиолетовом диапазоне
-- `mvv_mag` — видимая звёздная величина в визуальном диапазоне
-- `err` — обобщённая ошибка измерений
-- `present` — флаг переменности звезды (0 — не является переменной, 1 — является)
-- `type` — тип переменности звезды
-- `min_mag` — минимальная видимая звёздная величина звезды в течение её переменного цикла
-- `max_mag` — максимальная видимая звёздная величина звезды в течение её переменного цикла
+- `RAJ2000` — Right Ascension in the J2000 epoch (in degrees)
+- `DEJ2000` — Declination in the J2000 epoch (in degrees)
+- `nobs` — Number of observations
+- `Vmag` — Apparent magnitude in the V-band (optical range)
+- `e_Vmag` — Measurement error of `Vmag`
+- `Bmag` — Apparent magnitude in the B-band (blue range)
+- `e_Bmag` — Measurement error of `Bmag`
+- `gpmag` — Apparent magnitude in the Gaia G-band (data from the Gaia space telescope)
+- `e_gpmag` — Measurement error of `gpmag`
+- `rpmag` — Apparent magnitude in the Gaia RP-band (red range, Gaia data)
+- `e_rpmag` — Measurement error of `rpmag`
+- `ipmag` — Apparent magnitude in the I-band (near-infrared range)
+- `e_ipmag` — Measurement error of `ipmag`
+- `fuv_mag` — Apparent magnitude in the far-ultraviolet range
+- `nuv_mag` — Apparent magnitude in the near-ultraviolet range
+- `err` — Generalized measurement error
+- `present` — Variability flag (0 = non-variable, 1 = variable)
+- `type` — Type of variability
+- `min_mag` — Minimum apparent magnitude during the variability cycle
+- `max_mag` — Maximum apparent magnitude during the variability cycle
 
-Колонки `present` и `type` нужны для бинарной и многоклассовой классификации -
-на этом этапе колонка `type` использоваться не будет.
+The columns `present` and `type` are used for binary and multiclass classification, respectively.
+At this stage, the `type` column is not utilized.
 
-Рассмотрим корреляцию характеристик с переменностью звезды:
+### Correlation Analysis
 
-|           | variable  |
-|:---------:|:---------:|
-| `RAJ2000` | -0.007308 |
-| `DEJ2000` | -0.012249 |
-|  `nobs`   | -0.002505 |
-|  `Vmag`   | 0.029900  |
-| `e_Vmag`  | 0.133351  |
-|  `Bmag`   | 0.028588  |
-| `e_Bmag`  | 0.111372  |
-|  `gpmag`  | 0.029341  |
-| `e_gpmag` | 0.077565  |
-|  `rpmag`  | 0.029131  |
-| `e_rpmag` | 0.102294  |
-|  `ipmag`  | 0.026696  |
-| `e_ipmag` | 0.031454  |
-| `fuv_mag` | -0.069927 |
-| `nuv_mag` | 0.041075  |
-| `min_mag` | 0.012656  |
-| `max_mag` | -0.014640 |
-|   `err`   | 0.091020  |
+The correlation between features and stellar variability is as follows:
 
-Из таблицы видно, что наибольшее влияние оказывают колонки, связанные с ошибкой.
-Наше объяснение таково: переменность светимости непосредственно связана
-с изменением видимой звездной величины, а её изменение регистрируется как ошибка.
-Ошибка в данном случае представляет собой среднеквадратичное отклонение наблюдаемой величины от матожидания,
-и чем она больше, тем, вероятно, сильнее изменяется эта характеристика (и тем меньше влияние ошибок измерения).
+|           | variable  |  
+|:---------:|:---------:|  
+| `RAJ2000` | -0.007308 |  
+| `DEJ2000` | -0.012249 |  
+|  `nobs`   | -0.002505 |  
+|  `Vmag`   | 0.029900  |  
+| `e_Vmag`  | 0.133351  |  
+|  `Bmag`   | 0.028588  |  
+| `e_Bmag`  | 0.111372  |  
+|  `gpmag`  | 0.029341  |  
+| `e_gpmag` | 0.077565  |  
+|  `rpmag`  | 0.029131  |  
+| `e_rpmag` | 0.102294  |  
+|  `ipmag`  | 0.026696  |  
+| `e_ipmag` | 0.031454  |  
+| `fuv_mag` | -0.069927 |  
+| `nuv_mag` | 0.041075  |  
+| `min_mag` | 0.012656  |  
+| `max_mag` | -0.014640 |  
+|   `err`   | 0.091020  |  
 
-Спорным моментом является трактование влияния колонок `RAJ2000` и `DEJ2000` - они представляют координаты звезды,
-и, хотя кажется, что они не должны влиять на переменность светимости, корреляция указывает обратное
-(наше исследование показало, что модели обучающиеся на полных данных показывают себя чуть лучше).
+![Binary classification correlation matrix](binary_classification/docs/images/correlation_matrix.png)
 
-В полученных данных есть проблема с разделением на классы:
+The table shows that error-related columns have the strongest influence.
+Our interpretation is that variability is directly linked to changes in apparent magnitude,
+which are recorded as measurement errors.
+Here, the error represents the standard deviation from the expected value,
+and larger errors likely indicate stronger variability (with less influence from measurement inaccuracies).
 
-![Разделение на классы в полученных данных](binary_classification/docs/images/variable_ratio.png)
+The influence of `RAJ2000` and `DEJ2000` (stellar coordinates) is debatable —
+while they theoretically should not affect variability,
+the correlation suggests otherwise (our research indicates models trained on full data perform slightly better).
 
-Эта проблема в ходе исследования решалась **взвешиванием классов** или **уменьшением выборки**.
+### Class Imbalance
 
-### Исследование
+The dataset suffers from class imbalance:
 
-Решение проблемы бинарной классификации проводилось как с помощью встроенных
-в [`scikit-learn`](https://scikit-learn.org/stable/) моделей,
-так и с использованием нейронных сетей на основе [`keras`](https://keras.io/)
-и [`tensorflow`](https://www.tensorflow.org/).
+![Class distribution in the dataset](binary_classification/docs/images/variable_ratio.png)
 
-В ходе исследования использовались метрики `accuracy`, `precision`, `recall`, `F1-score`.
-Целью является определение звезд с переменной светимостью,
-а их количество относительно общего объема данных мало.
-С одной стороны, нежелательно пропускать звезду с переменной светимостью (максимизация `recall`),
-с другой же, слишком большое количество ошибок нежелательно для перепроверяющего (максимизация `F1-score`).
-Далее мы фокусировались на максимизации `recall` и `F1-score`.
+This issue was addressed during the study using **class weighting** and **undersampling**.
 
-#### Встроенные модели `scikit-learn`
+### Research
 
-Ниже представлены классификаторы на основе моделей из библиотеки [`scikit-learn`](https://scikit-learn.org/stable/).
+The binary classification problem was tackled using both built-in [`scikit-learn`](https://scikit-learn.org/stable/)
+models
+and neural networks based on [`keras`](https://keras.io/) and [`tensorflow`](https://www.tensorflow.org/).
 
-##### Логистическая регрессия; взвешивание классов
+The evaluation metrics included **accuracy**, **precision**, **recall**, and **F1-score**.
+The goal was to identify variable stars, which are rare in the dataset.
+While maximizing **recall** (avoiding missed detections) was important,
+maintaining a reasonable **F1-score** (balancing precision and recall) was also prioritized.
+
+#### Built-in `scikit-learn` Models
+
+##### Logistic Regression (Class Weighting)
 
 ![Confusion matrix for logistic regression](binary_classification/docs/images/cm_logistic_regression.png)
 
-| Accuracy | Precision | Recall | F1-score |
-|:--------:|:---------:|:------:|:--------:|
+| Accuracy | Precision | Recall | F1-score |  
+|:--------:|:---------:|:------:|:--------:|  
 |  0.607   |   0.136   | 0.547  |  0.218   |
 
-##### Случайный лес (стандартные параметры); взвешивание классов
+##### Random Forest (`max_depth=11`; Class Weighting)
 
-![Confusion matrix for default random forest](binary_classification/docs/images/cm_random_forest_default.png)
+![Confusion matrix for random forest](binary_classification/docs/images/cm_random_forest.png)
 
-| Accuracy | Precision | Recall | F1-score |
-|:--------:|:---------:|:------:|:--------:|
-|  0.936   |   0.884   | 0.414  |  0.564   |
+| Accuracy | Precision | Recall | F1-score |  
+|:--------:|:---------:|:------:|:--------:|  
+|  0.886   |   0.465   | 0.868  |  0.606   |  
 
-##### Случайный лес (параметры: `max_depth = 11`); взвешивание классов
+##### SGD (`modified_huber` Loss; Class Weighting)
 
-![Confusion matrix for configured random forest](binary_classification/docs/images/cm_random_forest.png)
+![Confusion matrix for sgd](binary_classification/docs/images/cm_sgd.png)
 
-| Accuracy | Precision | Recall | F1-score |
-|:--------:|:---------:|:------:|:--------:|
-|  0.886   |   0.465   | 0.868  |  0.606   |
-
-##### `SGDClassifier` (функция потерь `modified_huber`); взвешивание классов
-
-![Confusion matrix for `SGDClassifier`](binary_classification/docs/images/cm_sgd.png)
-
-| Accuracy | Precision | Recall | F1-score |
-|:--------:|:---------:|:------:|:--------:|
+| Accuracy | Precision | Recall | F1-score |  
+|:--------:|:---------:|:------:|:--------:|  
 |  0.887   |   0.241   | 0.048  |  0.081   |
 
-##### Градиентный бустинг (стандартные параметры); уменьшение выборки
+##### Gradient Boosting (`max_depth=13`; Undersampling)
 
-![Confusion matrix for default gradient boosting](binary_classification/docs/images/cm_gradient_boosting_default.png)
+![Confusion matrix for gradient boosting](binary_classification/docs/images/cm_gradient_boosting.png)
 
-| Accuracy | Precision | Recall | F1-score |
-|:--------:|:---------:|:------:|:--------:|
-|  0.816   |   0.352   | 0.935  |  0.511   |
+| Accuracy | Precision | Recall | F1-score |  
+|:--------:|:---------:|:------:|:--------:|  
+|  0.879   |   0.451   | 0.991  |  0.620   |  
 
-##### Градиентный бустинг (параметры: `max_depth=13`); уменьшение выборки
+#### Neural Networks
 
-![Confusion matrix for configured gradient boosting](binary_classification/docs/images/cm_gradient_boosting.png)
+##### Neural Network Emulating Logistic Regression (Class Weighting)
 
-| Accuracy | Precision | Recall | F1-score |
-|:--------:|:---------:|:------:|:--------:|
-|  0.879   |   0.451   | 0.991  |  0.620   |
+**Architecture:**
 
-#### Нейронные сети
+|  Layer 1  |  
+|:---------:|  
+| 1 neuron  |  
+| `sigmoid` |  
 
-Ниже представлены классификаторы на основе нейронных сетей;
-вместе с каждым также указаны параметры сети и гиперпараметры обучения.
+**Hyperparameters:**
 
-##### Нейронная сеть, эмулирующая логистическую регрессию; взвешивание классов
-
-Конфигурация нейронной сети:
-
-|                     |  Слой 1   |
-|:--------------------|:---------:|
-| Количество нейронов |     1     |
-| Функция активации   | `sigmoid` |
-
-Гиперпараметры обучения:
-
-| Количество эпох | Оптимизатор |                                      Learning rate                                       |                               Функция потерь                                |
-|:---------------:|:-----------:|:----------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------:|
-|       50        |   `Adam`    | `keras.optimizers.schedules.ExponentialDecay(1e-2, decay_steps=15000, decay_rate=0.01))` | `BinaryFocalCrossentropy(apply_class_balancing=True, alpha=0.9, gamma=1.0)` |
+| Epochs | Optimizer |  Learning Rate Schedule (`ExponentialDecay`)   | Loss (`BinaryFocalCrossentropy`) |  
+|:------:|:---------:|:----------------------------------------------:|:--------------------------------:|  
+|   50   |   Adam    | `1e-2`, `decay_steps=15000`, `decay_rate=0.01` |     `alpha=0.9`, `gamma=1.0`     |  
 
 ![Confusion matrix for neural network that emulates logistic regression](binary_classification/docs/images/cm_nn_emulating_logistic_regression.png)
 
-| Accuracy | Precision | Recall | F1-score |
-|:--------:|:---------:|:------:|:--------:|
+| Accuracy | Precision | Recall | F1-score |  
+|:--------:|:---------:|:------:|:--------:|  
 |  0.661   |   0.149   | 0.493  |  0.229   |
 
-##### Лучший классификатор; взвешивание классов
+##### Best Neural Network Classifier (Class Weighting)
 
-Конфигурация нейронной сети:
+**Architecture:**
 
-|                     | Слой 1 |    Слой 2     |  Слой 3   |
-|:--------------------|:------:|:-------------:|:---------:|
-| Количество нейронов |  1024  |      128      |     1     |
-| Функция активации   | `mish` | `hard_shrink` | `sigmoid` |
+|   Layer 1    |    Layer 2    |  Layer 3  |  
+|:------------:|:-------------:|:---------:|  
+| 1024 neurons |  128 neurons  | 1 neuron  |  
+|    `mish`    | `hard_shrink` | `sigmoid` |  
 
-Гиперпараметры обучения:
+**Hyperparameters:**
 
-| Количество эпох | Оптимизатор |                                      Learning rate                                       |                               Функция потерь                                |
-|:---------------:|:-----------:|:----------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------:|
-|       24        |   `Adam`    | `keras.optimizers.schedules.ExponentialDecay(1e-2, decay_steps=15000, decay_rate=0.01))` | `BinaryFocalCrossentropy(apply_class_balancing=True, alpha=0.9, gamma=1.0)` |
+| Epochs | Optimizer |  Learning Rate Schedule (`ExponentialDecay`)   | Loss (`BinaryFocalCrossentropy`) |  
+|:------:|:---------:|:----------------------------------------------:|:--------------------------------:|  
+|   24   |   Adam    | `1e-2`, `decay_steps=15000`, `decay_rate=0.01` |     `alpha=0.9`, `gamma=1.0`     |  
 
 ![Confusion matrix for best neural network classifier](binary_classification/docs/images/cm_nnclassifier.png)
 
-| Accuracy | Precision | Recall | F1-score |
-|:--------:|:---------:|:------:|:--------:|
-|  0.895   |   0.496   | 0.916  |  0.643   |
+| Accuracy | Precision | Recall | F1-score |  
+|:--------:|:---------:|:------:|:--------:|  
+|  0.895   |   0.496   | 0.916  |  0.643   |  
 
-###### Замечание
+###### Note
 
-В ходе исследования мы выявили проблему сходимости по гиперплоскости ошибки.
-Начальные условия (обычно задающиеся случайно) очень сильно влияют на результаты моделей -
-они колеблятся между отсутствием предсказания как такового (всегда 0 или всегда 1)
-и лучшим предсказанием среди всех моделей.
-[Веса](datasets/best_weights.keras) этой модели, отражающие успешную тренировку на первых 8 эпохах,
-сохранены в отдельном файле, с которого происходит загрузка при запуске программы.
+During training, we observed convergence issues due to initial weight sensitivity.
+The model’s performance varied significantly based on initialization,
+ranging from trivial predictions (all 0 or all 1) to the best performance.
+The [weights](datasets/best_weights.keras) from a successful training run (first 8 epochs) were saved
+and are loaded when running the application.
 
-### Итоги
+### Results
 
-Полная таблица результатов исследования представлена ниже.
+The full comparison of models is summarized below:
 
-|                                                   | Accuracy | Precision |  Recall   | F1-score  |
-|:--------------------------------------------------|:--------:|:---------:|:---------:|:---------:|
-| Логистическая регрессия                           |  0.607   |   0.136   |   0.547   |   0.218   |
-| Случайный лес (стандартные параметры)             |  0.936   |   0.884   |   0.414   |   0.564   |
-| Случайный лес (`max_depth = 11`)                  |  0.886   |   0.465   |   0.868   |   0.606   |
-| `SGDClassifier` (функция потерь `modified_huber`) |  0.887   |   0.241   |   0.048   |   0.081   |
-| Градиентный бустинг (стандартные параметры)       |  0.816   |   0.352   |   0.935   |   0.511   |
-| Градиентный бустинг (`max_depth=13`)              |  0.879   |   0.451   | **0.991** |   0.620   |
-|                                                   |          |           |           |           |
-| Нейронная сеть (логистическая регрессия)          |  0.661   |   0.149   |   0.493   |   0.229   |
-| Нейронная сеть                                    |  0.895   | **0.496** |   0.916   | **0.643** |
+| Model                                | Accuracy | Precision |  Recall   | F1-score  |  
+|:-------------------------------------|:--------:|:---------:|:---------:|:---------:|  
+| Logistic Regression                  |  0.607   |   0.136   |   0.547   |   0.218   |  
+| Random Forest (`max_depth=11`)       |  0.886   |   0.465   |   0.868   |   0.606   |  
+| SGD (`modified_huber`)               |  0.887   |   0.241   |   0.048   |   0.081   |  
+| Gradient Boosting (`max_depth=13`)   |  0.879   |   0.451   | **0.991** |   0.620   |
+|                                      |          |           |           |           |
+| Neural Network (Logistic Regression) |  0.661   |   0.149   |   0.493   |   0.229   |  
+| **Neural Network**                   |  0.895   | **0.496** |   0.916   | **0.643** |  
 
-Из всех классификаторов `scikit-learn` **настроенный градиентный бустинг** показал себя лучше всего по совокупности
-метрик;
-`recall` максимален, при этом `F1-score` находится на достойном уровне.
+Among the `scikit-learn` models, the **Gradient Boosting** classifier performed best overall,
+achieving the highest **recall** while maintaining a competitive **F1-score**.
 
-Полученная нейронная сеть, хоть и показывает меньший `recall`, имеет больший `precision` и `F1-score`,
-и, по нашему мнению, является лучшим классификатором.
+However, the neural network, despite slightly lower recall, achieved better **precision** and **F1-score**,
+making it the superior classifier for this task.
+
+## Multiclass Classification
+
+### Data
+
+The data is just the same as it was, but now we are using `type` column.
+
+After some grouping here are types of variable stars with their ids:
+
+- `UNKNOWN` - stars with variability that cannot be confidently classified into known categories or with no variability
+  at all
+- `ECLIPSING` - binary star systems where one star periodically passes in front of the other, causing detectable dips in
+  brightness
+- `CEPHEIDS` - pulsating variable stars with a precise period-luminosity relationship, used as "standard candles" in
+  astronomy
+- `RR_LYRAE` - short-period pulsating stars found in globular clusters, with periods < 1 day and lower luminosity
+  than `Cepheids`
+- `DELTA_SCUTI_ETC` - delta Scuti stars and similar pulsating variables with short periods (hours) and small amplitude
+  changes
+- `LONG_PERIOD` - stars with variability cycles spanning months to years
+- `ROTATIONAL` - variability caused by starspots or non-uniform surface brightness due to rapid rotation
+- `ERUPTIVE` - irregular brightness changes due to flares or mass ejections
+- `CATACLYSMIC` - cataclysmic variables with sudden outbursts, often in binary systems
+- `EMISSION_WR` - Wolf-Rayet stars with strong emission lines from stellar winds
+
+`UNKNOWN` category was removed because now we are trying to classify only types of actual variable stars,
+`ERUPTIVE` and `EMISSION_WR` were removed because there are no data available for them in the dataset.
+
+Here is correlation matrix for multiclass dataset:
+
+![Correlation matrix](multiclass_classification/docs/images/correlation_matrix.png)
+
+#### Class Imbalance
+
+Once again there is class imbalance:
+
+![Class imbalance](multiclass_classification/docs/images/variable_ratio.png)
+
+Although `CEPHEIDS` and `CATACLYSMIC` stars are almost non-existent in dataset,
+it would be a nice challenge to try to classify those correctly.
+
+All models are using balanced class weights, no undersampling is applied
+(there would be no data left after undersampling).
+
+### Research
+
+The multiclass classification was solved by built-in [`scikit-learn`](https://scikit-learn.org/stable/) models
+which use 1v1 strategy automatically for multiclass.
+
+The models were evaluated using **precision**, **recall**, and **F1-score** for each class,
+along with **macro** and **weighted** averages.
+
+#### Logistic Regression
+
+![Confusion matrix for logistic regression](multiclass_classification/docs/images/cm_logistic_regression.png)
+
+|       Class       | Precision | Recall | F1-Score | Support |  
+|:-----------------:|:---------:|:------:|:--------:|:-------:|  
+|    `ECLIPSING`    |   0.53    |  0.25  |   0.34   |   280   |  
+|    `CEPHEIDS`     |   0.01    |  0.33  |   0.01   |    3    |  
+|    `RR_LYRAE`     |   0.46    |  0.54  |   0.50   |   125   |  
+| `DELTA_SCUTI_ETC` |   0.76    |  0.83  |   0.80   |   761   |  
+|   `LONG_PERIOD`   |   0.12    |  0.47  |   0.20   |   17    |  
+|   `ROTATIONAL`    |   0.85    |  0.40  |   0.54   |   528   |  
+|   `CATACLYSMIC`   |   0.02    |  1.00  |   0.03   |    2    |  
+|                   |   0.72    |  0.58  |   0.61   |  1716   |  
+
+#### SVC
+
+![Confusion matrix for svc](multiclass_classification/docs/images/cm_svc.png)
+
+|       Class       | Precision | Recall | F1-Score | Support |  
+|:-----------------:|:---------:|:------:|:--------:|:-------:|  
+|    `ECLIPSING`    |   0.52    |  0.19  |   0.27   |   262   |  
+|    `CEPHEIDS`     |   0.02    |  0.80  |   0.04   |    5    |  
+|    `RR_LYRAE`     |   0.35    |  0.27  |   0.31   |   124   |  
+| `DELTA_SCUTI_ETC` |   0.65    |  0.50  |   0.57   |   786   |  
+|   `LONG_PERIOD`   |   0.06    |  0.58  |   0.10   |   12    |  
+|   `ROTATIONAL`    |   0.41    |  0.22  |   0.29   |   524   |  
+|   `CATACLYSMIC`   |   0.00    |  0.33  |   0.01   |    3    |  
+|                   |   0.53    |  0.35  |   0.41   |  1716   |
+
+#### K-Nearest Neighbors
+
+![Confusion matrix for knn](multiclass_classification/docs/images/cm_knn.png)
+
+|       Class       | Precision | Recall | F1-Score | Support |  
+|:-----------------:|:---------:|:------:|:--------:|:-------:|  
+|    `ECLIPSING`    |   0.40    |  0.43  |   0.41   |   268   |  
+|    `CEPHEIDS`     |   0.00    |  0.00  |   0.00   |    4    |  
+|    `RR_LYRAE`     |   0.52    |  0.31  |   0.39   |   162   |  
+| `DELTA_SCUTI_ETC` |   0.66    |  0.89  |   0.76   |   742   |  
+|   `LONG_PERIOD`   |   0.00    |  0.00  |   0.00   |   13    |  
+|   `ROTATIONAL`    |   0.69    |  0.44  |   0.54   |   526   |  
+|   `CATACLYSMIC`   |   0.00    |  0.00  |   0.00   |    1    |  
+|                   |   0.61    |  0.62  |   0.59   |  1716   |
+
+#### Random Forest
+
+![Confusion matrix for random forest](multiclass_classification/docs/images/cm_random_forest.png)
+
+|       Class       | Precision | Recall | F1-Score | Support |  
+|:-----------------:|:---------:|:------:|:--------:|:-------:|  
+|    `ECLIPSING`    |   0.74    |  0.61  |   0.67   |   268   |  
+|    `CEPHEIDS`     |   0.50    |  0.25  |   0.33   |    4    |  
+|    `RR_LYRAE`     |   0.77    |  0.81  |   0.79   |   140   |  
+| `DELTA_SCUTI_ETC` |   0.88    |  0.94  |   0.91   |   760   |  
+|   `LONG_PERIOD`   |   0.83    |  0.50  |   0.62   |   10    |  
+|   `ROTATIONAL`    |   0.89    |  0.88  |   0.89   |   530   |  
+|   `CATACLYSMIC`   |   1.00    |  0.25  |   0.40   |    4    |  
+|                   |   0.85    |  0.85  |   0.85   |  1716   |
+
+#### SGD
+
+![Confusion matrix for sgd](multiclass_classification/docs/images/cm_sgd.png)
+
+|       Class       | Precision | Recall | F1-Score | Support |  
+|:-----------------:|:---------:|:------:|:--------:|:-------:|  
+|    `ECLIPSING`    |   0.37    |  0.49  |   0.42   |   271   |  
+|    `CEPHEIDS`     |   0.00    |  0.00  |   0.00   |    9    |  
+|    `RR_LYRAE`     |   0.64    |  0.42  |   0.51   |   175   |  
+| `DELTA_SCUTI_ETC` |   0.72    |  0.94  |   0.82   |   741   |  
+|   `LONG_PERIOD`   |   0.31    |  0.82  |   0.45   |   11    |  
+|   `ROTATIONAL`    |   0.90    |  0.38  |   0.54   |   506   |  
+|   `CATACLYSMIC`   |   0.00    |  0.00  |   0.00   |    3    |  
+|                   |   0.70    |  0.65  |   0.63   |  1716   |
+
+#### Gradient Boosting
+
+![Confusion matrix for gradient boosting](multiclass_classification/docs/images/cm_gradient_boosting.png)
+
+|       Class       | Precision | Recall | F1-Score | Support |  
+|:-----------------:|:---------:|:------:|:--------:|:-------:|  
+|    `ECLIPSING`    |   0.76    |  0.66  |   0.70   |   261   |  
+|    `CEPHEIDS`     |   0.11    |  0.12  |   0.12   |    8    |  
+|    `RR_LYRAE`     |   0.77    |  0.74  |   0.76   |   133   |  
+| `DELTA_SCUTI_ETC` |   0.89    |  0.94  |   0.91   |   766   |  
+|   `LONG_PERIOD`   |   0.75    |  0.64  |   0.69   |   14    |  
+|   `ROTATIONAL`    |   0.89    |  0.88  |   0.89   |   532   |  
+|   `CATACLYSMIC`   |   0.33    |  0.50  |   0.40   |    2    |  
+|                   |   0.85    |  0.86  |   0.86   |  1716   |
+
+### Results
+
+The full comparison of models is summarized below:
+
+| Model               | Weighted Precision | Weighted F1-Score |
+|---------------------|--------------------|-------------------|
+| Logistic Regression | 0.72               | 0.61              |
+| SVC                 | 0.53               | 0.41              |
+| K-Nearest Neighbors | 0.61               | 0.59              |
+| Random Forest       | **0.85**           | **0.85**          |
+| SGD                 | 0.70               | 0.63              |
+| Gradient Boosting   | **0.85**           | **0.86**          |
+
+Research showed that **Gradient Boosting** and **Random Forest** perform identically good.
+Noting that `sklearn` Gradient Boosting can't apply class balancing, that makes it the best classifier
+for multiclass classification.
+
+We can also pinpoint how well Gradient Boosting and Random Forest classify `CEPHEIDS` and `CATACLYSMIC` stars:
+they are able to recognise those stars even when their amount is very small.
+
+## Conclusion  
+
+This research successfully addressed the challenge of classifying variable stars
+through both **binary** (variable/non-variable) and
+**multiclass** (variable type) approaches.
+
+The key findings demonstrate that:  
+
+1. **Binary Classification**:  
+   - The custom **neural network** (Mish/Hard Shrink activation, Focal Loss) outperformed traditional
+   models with an `F1-score` of 0.643, balancing `precision` (0.496) and `recall` (0.916)
+   - **Gradient Boosting** achieved the highest `recall` (0.991), making it suitable for minimal false negatives
+
+2. **Multiclass Classification**:  
+   - **Gradient Boosting** emerged as the best model, achieving weighted `F1-score` = 0.86 and `precision` = 0.85,
+   excelling in identifying common classes (e.g., Delta Scuti) while handling rarer types.
+   - Class imbalance significantly impacted rare categories (e.g., Cepheids, Cataclysmic), highlighting the need for targeted data collection or augmentation
+
+3. **Astronomical Insights**:  
+   - Error metrics were critical predictors of variability, correlating with physical changes in stellar brightness
+   - The neural network’s sensitivity to initial weights suggests astrophysical variability patterns may require careful model initialization
+
+This work provides a robust framework for automating variable star identification,
+enabling astronomers to focus on high-value targets and accelerate discoveries in stellar astrophysics.
+That, along with interactive component, makes it a great tool for any stellar research.
+
+## Contributions
+Feel free to star this repository if you liked our research or if you are interested in it;
+in case of latter you are also welcome to contact our with your suggestions or questions.
