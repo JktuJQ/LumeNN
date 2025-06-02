@@ -29,10 +29,11 @@ def main(argv: t.List[str]) -> None:
             'random forest' ('4'),
             'SGD' ('5'),
             'gradient boosting' ('6'),
-        
+            'stacking' ('7'),
+
         Neural networks:
-            'neural network that emulates logistic regression' ('7'),
-            'neural network classifier' ('8')\n"""))
+            'neural network that emulates logistic regression' ('8'),
+            'neural network classifier' ('9')\n"""))
             if classifier_id == 1:
                 classifier = bc.LOGISTIC_REGRESSION_CLASSIFIER
             elif classifier_id == 2:
@@ -46,8 +47,10 @@ def main(argv: t.List[str]) -> None:
             elif classifier_id == 6:
                 classifier = bc.GRADIENT_BOOSTING_CLASSIFIER
             elif classifier_id == 7:
-                classifier = bc.NN_LOGISTIC_REGRESSION_CLASSIFIER
+                classifier = bc.STACKING_CLASSIFIER
             elif classifier_id == 8:
+                classifier = bc.NN_LOGISTIC_REGRESSION_CLASSIFIER
+            elif classifier_id == 9:
                 classifier = bc.NN_CLASSIFIER
                 classifier.classifier = keras.models.load_model("datasets/best_weights.keras")
             else:

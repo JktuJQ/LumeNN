@@ -139,6 +139,16 @@ maintaining a reasonable **F1-score** (balancing precision and recall) was also 
 |:--------:|:---------:|:------:|:--------:|  
 |  0.879   |   0.451   | 0.991  |  0.620   |  
 
+##### Stacking
+
+![Confusion matrix for stacking](binary_classification/docs/images/cm_stacking.png)
+
+| Accuracy | Precision | Recall | F1-score |  
+|:--------:|:---------:|:------:|:--------:|  
+|  0.949   |   0.831   | 0.620  |  0.710   |  
+
+It works well but fitting takes extremely long time.
+
 #### Neural Networks
 
 ##### Neural Network Emulating Logistic Regression (Class Weighting)
@@ -201,15 +211,17 @@ The full comparison of models is summarized below:
 | Random Forest (`max_depth=11`)       |  0.886   |   0.465   |   0.868   |   0.606   |  
 | SGD (`modified_huber`)               |  0.887   |   0.241   |   0.048   |   0.081   |  
 | Gradient Boosting (`max_depth=13`)   |  0.879   |   0.451   | **0.991** |   0.620   |
+| Stacking                             |  0.949   | **0.831** |   0.620   | **0.710** |  
 |                                      |          |           |           |           |
 | Neural Network (Logistic Regression) |  0.661   |   0.149   |   0.493   |   0.229   |  
-| **Neural Network**                   |  0.895   | **0.496** |   0.916   | **0.643** |  
+| **Neural Network**                   |  0.895   |   0.496   |   0.916   |   0.643   |  
 
-Among the `scikit-learn` models, the **Gradient Boosting** classifier performed best overall,
-achieving the highest **recall** while maintaining a competitive **F1-score**.
+Among the `scikit-learn` models, the **Stacking Classifier** performed best overall,
+achieving the highest **precision** and **F1-score**. But **Gradient Boosting Classifier**
+has the best **recall** that is important in our task.
 
-However, the neural network, despite slightly lower recall, achieved better **precision** and **F1-score**,
-making it the superior classifier for this task.
+The neural network might not have the best metrics but their combination looks pretty good
+and competetive so this solution has great future.
 
 ## Multiclass Classification
 
