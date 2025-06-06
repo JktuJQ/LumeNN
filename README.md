@@ -47,32 +47,32 @@ When processing the data, the following features of celestial objects must be co
 - `max_mag` — Maximum apparent magnitude during the variability cycle
 
 The columns `present` and `type` are used for binary and multiclass classification, respectively.
-At this stage, the `type` column is not utilized.
+At this stage, the `type` column is deleted.
 
 ### Correlation Analysis
 
 The correlation between features and stellar variability is as follows:
 
 |           | variable  |  
-|:---------:|:---------:|  
+|:----------|:---------:|  
 | `RAJ2000` | -0.007308 |  
 | `DEJ2000` | -0.012249 |  
-|  `nobs`   | -0.002505 |  
-|  `Vmag`   | 0.029900  |  
+| `nobs`    | -0.002505 |  
+| `Vmag`    | 0.029900  |  
 | `e_Vmag`  | 0.133351  |  
-|  `Bmag`   | 0.028588  |  
+| `Bmag`    | 0.028588  |  
 | `e_Bmag`  | 0.111372  |  
-|  `gpmag`  | 0.029341  |  
+| `gpmag`   | 0.029341  |  
 | `e_gpmag` | 0.077565  |  
-|  `rpmag`  | 0.029131  |  
+| `rpmag`   | 0.029131  |  
 | `e_rpmag` | 0.102294  |  
-|  `ipmag`  | 0.026696  |  
+| `ipmag`   | 0.026696  |  
 | `e_ipmag` | 0.031454  |  
 | `fuv_mag` | -0.069927 |  
 | `nuv_mag` | 0.041075  |  
 | `min_mag` | 0.012656  |  
 | `max_mag` | -0.014640 |  
-|   `err`   | 0.091020  |  
+| `err`     | 0.091020  |  
 
 ![Binary classification correlation matrix](binary_classification/docs/images/correlation_matrix.png)
 
@@ -198,7 +198,7 @@ It works well but fitting takes extremely long time.
 During training, we observed convergence issues due to initial weight sensitivity.
 The model’s performance varied significantly based on initialization,
 ranging from trivial predictions (all 0 or all 1) to the best performance.
-The [weights](datasets/best_weights.keras) from a successful training run (first 8 epochs) were saved
+The weights from a successful training run (first 8 epochs) were [saved](datasets/best_weights.keras)
 and are loaded when running the application.
 
 ### Results
@@ -218,10 +218,11 @@ The full comparison of models is summarized below:
 
 Among the `scikit-learn` models, the **Stacking Classifier** performed best overall,
 achieving the highest **precision** and **F1-score**. But **Gradient Boosting Classifier**
-has the best **recall** that is important in our task.
+has the best **recall** which is important in our task.
 
-The neural network might not have the best metrics but their combination looks pretty good
-and competetive so this solution has great future.
+The neural network results are competitive with other classifiers, which should be noted -
+our configuration is fairly simple and so it is possible that different
+highly tuned neural network could outperform  all `scikit-learn` classifiers by a fair amount.
 
 ## Multiclass Classification
 
@@ -229,7 +230,7 @@ and competetive so this solution has great future.
 
 The data is just the same as it was, but now we are using `type` column.
 
-After some grouping here are types of variable stars with their ids:
+After some grouping here are types of variable stars:
 
 - `UNKNOWN` - stars with variability that cannot be confidently classified into known categories or with no variability
   at all
@@ -272,96 +273,100 @@ The multiclass classification was solved by built-in [`scikit-learn`](https://sc
 which use 1v1 strategy automatically for multiclass.
 
 The models were evaluated using **precision**, **recall**, and **F1-score** for each class,
-along with **macro** and **weighted** averages.
+along with weighted average.
+
+On confusion matrices classes are written with their id,
+which does not necessarily match their id from correlation matrix image or their ordering number -
+this id corresponds to their position in the metrics table.
 
 #### Logistic Regression
 
 ![Confusion matrix for logistic regression](multiclass_classification/docs/images/cm_logistic_regression.png)
 
-|       Class       | Precision | Recall | F1-Score | Support |  
-|:-----------------:|:---------:|:------:|:--------:|:-------:|  
-|    `ECLIPSING`    |   0.53    |  0.25  |   0.34   |   280   |  
-|    `CEPHEIDS`     |   0.01    |  0.33  |   0.01   |    3    |  
-|    `RR_LYRAE`     |   0.46    |  0.54  |   0.50   |   125   |  
+| Class             | Precision | Recall | F1-Score | Support |  
+|:------------------|:---------:|:------:|:--------:|:-------:|  
+| `ECLIPSING`       |   0.53    |  0.25  |   0.34   |   280   |  
+| `CEPHEIDS`        |   0.01    |  0.33  |   0.01   |    3    |  
+| `RR_LYRAE`        |   0.46    |  0.54  |   0.50   |   125   |  
 | `DELTA_SCUTI_ETC` |   0.76    |  0.83  |   0.80   |   761   |  
-|   `LONG_PERIOD`   |   0.12    |  0.47  |   0.20   |   17    |  
-|   `ROTATIONAL`    |   0.85    |  0.40  |   0.54   |   528   |  
-|   `CATACLYSMIC`   |   0.02    |  1.00  |   0.03   |    2    |  
+| `LONG_PERIOD`     |   0.12    |  0.47  |   0.20   |   17    |  
+| `ROTATIONAL`      |   0.85    |  0.40  |   0.54   |   528   |  
+| `CATACLYSMIC`     |   0.02    |  1.00  |   0.03   |    2    |  
 |                   |   0.72    |  0.58  |   0.61   |  1716   |  
 
 #### SVC
 
 ![Confusion matrix for svc](multiclass_classification/docs/images/cm_svc.png)
 
-|       Class       | Precision | Recall | F1-Score | Support |  
-|:-----------------:|:---------:|:------:|:--------:|:-------:|  
-|    `ECLIPSING`    |   0.52    |  0.19  |   0.27   |   262   |  
-|    `CEPHEIDS`     |   0.02    |  0.80  |   0.04   |    5    |  
-|    `RR_LYRAE`     |   0.35    |  0.27  |   0.31   |   124   |  
+| Class             | Precision | Recall | F1-Score | Support |  
+|:------------------|:---------:|:------:|:--------:|:-------:|  
+| `ECLIPSING`       |   0.52    |  0.19  |   0.27   |   262   |  
+| `CEPHEIDS`        |   0.02    |  0.80  |   0.04   |    5    |  
+| `RR_LYRAE`        |   0.35    |  0.27  |   0.31   |   124   |  
 | `DELTA_SCUTI_ETC` |   0.65    |  0.50  |   0.57   |   786   |  
-|   `LONG_PERIOD`   |   0.06    |  0.58  |   0.10   |   12    |  
-|   `ROTATIONAL`    |   0.41    |  0.22  |   0.29   |   524   |  
-|   `CATACLYSMIC`   |   0.00    |  0.33  |   0.01   |    3    |  
+| `LONG_PERIOD`     |   0.06    |  0.58  |   0.10   |   12    |  
+| `ROTATIONAL`      |   0.41    |  0.22  |   0.29   |   524   |  
+| `CATACLYSMIC`     |   0.00    |  0.33  |   0.01   |    3    |  
 |                   |   0.53    |  0.35  |   0.41   |  1716   |
 
 #### K-Nearest Neighbors
 
 ![Confusion matrix for knn](multiclass_classification/docs/images/cm_knn.png)
 
-|       Class       | Precision | Recall | F1-Score | Support |  
-|:-----------------:|:---------:|:------:|:--------:|:-------:|  
-|    `ECLIPSING`    |   0.40    |  0.43  |   0.41   |   268   |  
-|    `CEPHEIDS`     |   0.00    |  0.00  |   0.00   |    4    |  
-|    `RR_LYRAE`     |   0.52    |  0.31  |   0.39   |   162   |  
+| Class             | Precision | Recall | F1-Score | Support |  
+|:------------------|:---------:|:------:|:--------:|:-------:|  
+| `ECLIPSING`       |   0.40    |  0.43  |   0.41   |   268   |  
+| `CEPHEIDS`        |   0.00    |  0.00  |   0.00   |    4    |  
+| `RR_LYRAE`        |   0.52    |  0.31  |   0.39   |   162   |  
 | `DELTA_SCUTI_ETC` |   0.66    |  0.89  |   0.76   |   742   |  
-|   `LONG_PERIOD`   |   0.00    |  0.00  |   0.00   |   13    |  
-|   `ROTATIONAL`    |   0.69    |  0.44  |   0.54   |   526   |  
-|   `CATACLYSMIC`   |   0.00    |  0.00  |   0.00   |    1    |  
+| `LONG_PERIOD`     |   0.00    |  0.00  |   0.00   |   13    |  
+| `ROTATIONAL`      |   0.69    |  0.44  |   0.54   |   526   |  
+| `CATACLYSMIC`     |   0.00    |  0.00  |   0.00   |    1    |  
 |                   |   0.61    |  0.62  |   0.59   |  1716   |
 
 #### Random Forest
 
 ![Confusion matrix for random forest](multiclass_classification/docs/images/cm_random_forest.png)
 
-|       Class       | Precision | Recall | F1-Score | Support |  
-|:-----------------:|:---------:|:------:|:--------:|:-------:|  
-|    `ECLIPSING`    |   0.74    |  0.61  |   0.67   |   268   |  
-|    `CEPHEIDS`     |   0.50    |  0.25  |   0.33   |    4    |  
-|    `RR_LYRAE`     |   0.77    |  0.81  |   0.79   |   140   |  
+| Class             | Precision | Recall | F1-Score | Support |  
+|:------------------|:---------:|:------:|:--------:|:-------:|  
+| `ECLIPSING`       |   0.74    |  0.61  |   0.67   |   268   |  
+| `CEPHEIDS`        |   0.50    |  0.25  |   0.33   |    4    |  
+| `RR_LYRAE`        |   0.77    |  0.81  |   0.79   |   140   |  
 | `DELTA_SCUTI_ETC` |   0.88    |  0.94  |   0.91   |   760   |  
-|   `LONG_PERIOD`   |   0.83    |  0.50  |   0.62   |   10    |  
-|   `ROTATIONAL`    |   0.89    |  0.88  |   0.89   |   530   |  
-|   `CATACLYSMIC`   |   1.00    |  0.25  |   0.40   |    4    |  
+| `LONG_PERIOD`     |   0.83    |  0.50  |   0.62   |   10    |  
+| `ROTATIONAL`      |   0.89    |  0.88  |   0.89   |   530   |  
+| `CATACLYSMIC`     |   1.00    |  0.25  |   0.40   |    4    |  
 |                   |   0.85    |  0.85  |   0.85   |  1716   |
 
 #### SGD
 
 ![Confusion matrix for sgd](multiclass_classification/docs/images/cm_sgd.png)
 
-|       Class       | Precision | Recall | F1-Score | Support |  
-|:-----------------:|:---------:|:------:|:--------:|:-------:|  
-|    `ECLIPSING`    |   0.37    |  0.49  |   0.42   |   271   |  
-|    `CEPHEIDS`     |   0.00    |  0.00  |   0.00   |    9    |  
-|    `RR_LYRAE`     |   0.64    |  0.42  |   0.51   |   175   |  
+| Class             | Precision | Recall | F1-Score | Support |  
+|:------------------|:---------:|:------:|:--------:|:-------:|  
+| `ECLIPSING`       |   0.37    |  0.49  |   0.42   |   271   |  
+| `CEPHEIDS`        |   0.00    |  0.00  |   0.00   |    9    |  
+| `RR_LYRAE`        |   0.64    |  0.42  |   0.51   |   175   |  
 | `DELTA_SCUTI_ETC` |   0.72    |  0.94  |   0.82   |   741   |  
-|   `LONG_PERIOD`   |   0.31    |  0.82  |   0.45   |   11    |  
-|   `ROTATIONAL`    |   0.90    |  0.38  |   0.54   |   506   |  
-|   `CATACLYSMIC`   |   0.00    |  0.00  |   0.00   |    3    |  
+| `LONG_PERIOD`     |   0.31    |  0.82  |   0.45   |   11    |  
+| `ROTATIONAL`      |   0.90    |  0.38  |   0.54   |   506   |  
+| `CATACLYSMIC`     |   0.00    |  0.00  |   0.00   |    3    |  
 |                   |   0.70    |  0.65  |   0.63   |  1716   |
 
 #### Gradient Boosting
 
 ![Confusion matrix for gradient boosting](multiclass_classification/docs/images/cm_gradient_boosting.png)
 
-|       Class       | Precision | Recall | F1-Score | Support |  
-|:-----------------:|:---------:|:------:|:--------:|:-------:|  
-|    `ECLIPSING`    |   0.76    |  0.66  |   0.70   |   261   |  
-|    `CEPHEIDS`     |   0.11    |  0.12  |   0.12   |    8    |  
-|    `RR_LYRAE`     |   0.77    |  0.74  |   0.76   |   133   |  
+| Class             | Precision | Recall | F1-Score | Support |  
+|:------------------|:---------:|:------:|:--------:|:-------:|  
+| `ECLIPSING`       |   0.76    |  0.66  |   0.70   |   261   |  
+| `CEPHEIDS`        |   0.11    |  0.12  |   0.12   |    8    |  
+| `RR_LYRAE`        |   0.77    |  0.74  |   0.76   |   133   |  
 | `DELTA_SCUTI_ETC` |   0.89    |  0.94  |   0.91   |   766   |  
-|   `LONG_PERIOD`   |   0.75    |  0.64  |   0.69   |   14    |  
-|   `ROTATIONAL`    |   0.89    |  0.88  |   0.89   |   532   |  
-|   `CATACLYSMIC`   |   0.33    |  0.50  |   0.40   |    2    |  
+| `LONG_PERIOD`     |   0.75    |  0.64  |   0.69   |   14    |  
+| `ROTATIONAL`      |   0.89    |  0.88  |   0.89   |   532   |  
+| `CATACLYSMIC`     |   0.33    |  0.50  |   0.40   |    2    |  
 |                   |   0.85    |  0.86  |   0.86   |  1716   |
 
 ### Results
@@ -369,17 +374,17 @@ along with **macro** and **weighted** averages.
 The full comparison of models is summarized below:
 
 | Model               | Weighted Precision | Weighted F1-Score |
-|---------------------|--------------------|-------------------|
-| Logistic Regression | 0.72               | 0.61              |
-| SVC                 | 0.53               | 0.41              |
-| K-Nearest Neighbors | 0.61               | 0.59              |
-| Random Forest       | **0.85**           | **0.85**          |
-| SGD                 | 0.70               | 0.63              |
-| Gradient Boosting   | **0.85**           | **0.86**          |
+|:--------------------|:------------------:|:-----------------:|
+| Logistic Regression |        0.72        |       0.61        |
+| SVC                 |        0.53        |       0.41        |
+| K-Nearest Neighbors |        0.61        |       0.59        |
+| Random Forest       |      **0.85**      |     **0.85**      |
+| SGD                 |        0.70        |       0.63        |
+| Gradient Boosting   |      **0.85**      |     **0.86**      |
 
-Research showed that **Gradient Boosting** and **Random Forest** perform identically good.
-Noting that `sklearn` Gradient Boosting can't apply class balancing, that makes it the best classifier
-for multiclass classification.
+Research showed that **Gradient Boosting** and **Random Forest** perform identically great.
+Taking in mind that `scikit-learn` Gradient Boosting does not apply class balancing,
+that makes it the best classifier for multiclass classification.
 
 We can also pinpoint how well Gradient Boosting and Random Forest classify `CEPHEIDS` and `CATACLYSMIC` stars:
 they are able to recognise those stars even when their amount is very small.
@@ -393,9 +398,10 @@ through both **binary** (variable/non-variable) and
 The key findings demonstrate that:  
 
 1. **Binary Classification**:  
-   - The custom **neural network** (Mish/Hard Shrink activation, Focal Loss) outperformed traditional
-   models with an `F1-score` of 0.643, balancing `precision` (0.496) and `recall` (0.916)
+   - The custom **neural network** (Mish/Hard Shrink activation, Focal Loss) outperformed most of the 
+   traditional models with an `F1-score` of 0.643, balancing `precision` (0.496) and `recall` (0.916)
    - **Gradient Boosting** achieved the highest `recall` (0.991), making it suitable for minimal false negatives
+   - **Stacking** classifier performed the best overall, achieving the highest **precision** and **F1-score**.
 
 2. **Multiclass Classification**:  
    - **Gradient Boosting** emerged as the best model, achieving weighted `F1-score` = 0.86 and `precision` = 0.85,
