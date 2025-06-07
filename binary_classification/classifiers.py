@@ -15,7 +15,7 @@ from sklearn.neural_network import MLPClassifier
 
 LOGISTIC_REGRESSION_CLASSIFIER = LogisticRegression(class_weight="balanced")
 SVC_CLASSIFIER = SVC(class_weight="balanced")
-KNN_CLASSIFIER = KNeighborsClassifier(n_neighbors=8, metric="manhattan", weights='distance')
+KNN_CLASSIFIER = KNeighborsClassifier(n_neighbors=7, metric="manhattan", weights='distance')
 RANDOM_FOREST_CLASSIFIER = RandomForestClassifier(max_depth=11, class_weight="balanced")
 SGD_CLASSIFIER = SGDClassifier(loss='modified_huber', class_weight="balanced")
 GRADIENT_BOOSTING_CLASSIFIER = GradientBoostingClassifier(max_depth=13)

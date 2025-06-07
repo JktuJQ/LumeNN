@@ -59,9 +59,15 @@ def main(argv: t.List[str]) -> None:
             else:
                 print("Wrong input - there is no classifier with code " + str(classifier_id))
                 continue
-
-            train_test_data = common.train_test_split_data(bd.BINARY_CLASSIFICATION_X,
+            
+            if classifier_id == 3:
+                train_test_data = common.train_test_split_data(
+                    bd.BINARY_CLASSIFICATION_X.drop(["RAJ2000", "DEJ2000", "nobs"], axis=1),
+                    bd.BINARY_CLASSIFICATION_Y)
+            else:
+                train_test_data = common.train_test_split_data(bd.BINARY_CLASSIFICATION_X,
                                                            bd.BINARY_CLASSIFICATION_Y)
+            
             train_data, test_data = common.train_test_scale(*train_test_data)
 
             print()
