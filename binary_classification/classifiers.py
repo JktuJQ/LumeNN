@@ -10,22 +10,17 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import StackingClassifier
-from sklearn.pipeline import make_pipeline, Pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import LinearSVC
 
 
 LOGISTIC_REGRESSION_CLASSIFIER = LogisticRegression(class_weight="balanced")
 SVC_CLASSIFIER = SVC(class_weight="balanced")
-KNN_CLASSIFIER = Pipeline([('scl', StandardScaler()), 
-                           ('knn', KNeighborsClassifier(n_neighbors=8, metric="manhattan", weights='distance'))])
+KNN_CLASSIFIER = KNeighborsClassifier(n_neighbors=8, metric="manhattan", weights='distance')
 RANDOM_FOREST_CLASSIFIER = RandomForestClassifier(max_depth=11, class_weight="balanced")
 SGD_CLASSIFIER = SGDClassifier(loss='modified_huber', class_weight="balanced")
 GRADIENT_BOOSTING_CLASSIFIER = GradientBoostingClassifier(max_depth=13)
 STACKING_CLASSIFIER = StackingClassifier(estimators=[
-    ('gb', GRADIENT_BOOSTING_CLASSIFIER),
-    ('svr', make_pipeline(StandardScaler(),
-                          LinearSVC()))
+    ("gradient boosting", GRADIENT_BOOSTING_CLASSIFIER),
+    ("random forest", RANDOM_FOREST_CLASSIFIER)
 ], final_estimator=LogisticRegression())
 
 

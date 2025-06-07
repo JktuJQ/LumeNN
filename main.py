@@ -39,7 +39,6 @@ def main(argv: t.List[str]) -> None:
             elif classifier_id == 2:
                 classifier = bc.SVC_CLASSIFIER
             elif classifier_id == 3:
-                bd.BINARY_CLASSIFICATION_X = bd.BINARY_CLASSIFICATION_X.drop(['RAJ2000', 'DEJ2000', 'nobs'], axis=1)
                 classifier = bc.KNN_CLASSIFIER
             elif classifier_id == 4:
                 classifier = bc.RANDOM_FOREST_CLASSIFIER
@@ -58,13 +57,19 @@ def main(argv: t.List[str]) -> None:
                 print("Wrong input - there is no classifier with code " + str(classifier_id))
                 continue
 
+            train_test_data = common.train_test_split_data(bd.BINARY_CLASSIFICATION_X,
+                                                           bd.BINARY_CLASSIFICATION_Y)
+            train_data, test_data = common.train_test_scale(*train_test_data)
+
             print()
-            ratio = input("You can change ratio of train and test dataset or leave blank to use default.\n")
-            train_data, test_data = common.train_test_split_data(bd.BINARY_CLASSIFICATION_X,
-                                                                 bd.BINARY_CLASSIFICATION_Y,
-                                                                 train_test_ratio=float(ratio) if ratio else 0.3)
-            if classifier_id in (6, 7):
+            balancing_method = int(input(
+                "Choose balancing method: 'oversampling' ('1'), 'undersampling' ('2') or 'class balancing' ('3')\n"))
+            if balancing_method == 1:
+                train_data = common.oversample(*train_data)
+            elif balancing_method == 2:
                 train_data = common.undersample(*train_data)
+            else:
+                pass
             classifier.fit(*train_data)
 
             print()
@@ -88,27 +93,34 @@ def main(argv: t.List[str]) -> None:
             'SGD' ('5'),
             'gradient boosting' ('6')\n"""))
             if classifier_id == 1:
-                classifier = bc.LOGISTIC_REGRESSION_CLASSIFIER
+                classifier = mc.LOGISTIC_REGRESSION_CLASSIFIER
             elif classifier_id == 2:
-                classifier = bc.SVC_CLASSIFIER
+                classifier = mc.SVC_CLASSIFIER
             elif classifier_id == 3:
-                classifier = bc.KNN_CLASSIFIER
+                classifier = mc.KNN_CLASSIFIER
             elif classifier_id == 4:
-                classifier = bc.RANDOM_FOREST_CLASSIFIER
+                classifier = mc.RANDOM_FOREST_CLASSIFIER
             elif classifier_id == 5:
-                classifier = bc.SGD_CLASSIFIER
+                classifier = mc.SGD_CLASSIFIER
             elif classifier_id == 6:
-                classifier = bc.GRADIENT_BOOSTING_CLASSIFIER
+                classifier = mc.GRADIENT_BOOSTING_CLASSIFIER
             else:
                 print("Wrong input - there is no classifier with code " + str(classifier_id))
                 continue
 
-            print()
-            ratio = input("You can change ratio of train and test dataset or leave blank to use default.\n")
-            train_data, test_data = common.train_test_split_data(md.MULTICLASS_CLASSIFICATION_X,
-                                                                 md.MULTICLASS_CLASSIFICATION_Y,
-                                                                 train_test_ratio=float(ratio) if ratio else 0.3)
+            train_test_data = common.train_test_split_data(md.MULTICLASS_CLASSIFICATION_X,
+                                                           md.MULTICLASS_CLASSIFICATION_Y)
+            train_data, test_data = common.train_test_scale(*train_test_data)
 
+            print()
+            balancing_method = int(input(
+                "Choose balancing method: 'oversampling' ('1'), 'undersampling' ('2') or 'class balancing' ('3')\n"))
+            if balancing_method == 1:
+                train_data = common.oversample(*train_data)
+            elif balancing_method == 2:
+                train_data = common.undersample(*train_data)
+            else:
+                pass
             classifier.fit(*train_data)
 
             print()
