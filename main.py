@@ -39,6 +39,7 @@ def main(argv: t.List[str]) -> None:
             elif classifier_id == 2:
                 classifier = bc.SVC_CLASSIFIER
             elif classifier_id == 3:
+                bd.BINARY_CLASSIFICATION_X = bd.BINARY_CLASSIFICATION_X.drop(['RAJ2000', 'DEJ2000', 'nobs'], axis=1)
                 classifier = bc.KNN_CLASSIFIER
             elif classifier_id == 4:
                 classifier = bc.RANDOM_FOREST_CLASSIFIER
@@ -62,7 +63,7 @@ def main(argv: t.List[str]) -> None:
             train_data, test_data = common.train_test_split_data(bd.BINARY_CLASSIFICATION_X,
                                                                  bd.BINARY_CLASSIFICATION_Y,
                                                                  train_test_ratio=float(ratio) if ratio else 0.3)
-            if classifier_id in (3, 6):
+            if classifier_id in (6, 7):
                 train_data = common.undersample(*train_data)
             classifier.fit(*train_data)
 
