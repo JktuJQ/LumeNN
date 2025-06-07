@@ -122,7 +122,7 @@ maintaining a reasonable **F1-score** (balancing precision and recall) was also 
 |:--------:|:---------:|:------:|:--------:|  
 |  0.607   |   0.136   | 0.547  |  0.218   |
 
-##### SVC (oversampling)
+##### SVC (Oversampling)
 
 ![Confusion matrix for SVC](binary_classification/docs/images/cm_svc.png)
 
@@ -130,15 +130,15 @@ maintaining a reasonable **F1-score** (balancing precision and recall) was also 
 |:--------:|:---------:|:------:|:--------:|  
 |  0.828   |   0.364   | 0.920  |  0.522   |
 
-##### K-Nearest Neighbors (no balancing, 7 neighbors, manhattan metric)
+##### K-Nearest Neighbors (No balancing)
+
+![Confusion matrix for KNN](binary_classification/docs/images/cm_knn_nobalancing.png)
 
 | Accuracy | Precision | Recall | F1-score |  
 |:--------:|:---------:|:------:|:--------:|  
 |  0.930   |   0.722   | 0.483  |  0.581   |
 
-![Confusion matrix for KNN](binary_classification/docs/images/cm_knn_nobalancing.png)
-
-##### K-Nearest Neighbors (oversampling)
+##### K-Nearest Neighbors (Oversampling)
 
 ![Confusion matrix for KNN](binary_classification/docs/images/cm_knn.png)
 
@@ -252,12 +252,12 @@ The full comparison of models is summarized below:
 |:--------------------------------------------------|:--------:|:---------:|:---------:|:---------:|  
 | Logistic Regression                               |  0.607   |   0.136   |   0.547   |   0.218   |
 | SVC                                               |  0.828   |   0.364   |   0.920   |   0.522   |
-| KNN (no balancing, 8 neighbors, manhattan metric) |  0.930   |   0.722   |   0.483   |   0.581   |
-| KNN                                               |  0.830   |   0.342   |   0.830   |   0.484   |
+| KNN (No balancing)                                |  0.930   |   0.722   |   0.483   |   0.581   |
+| KNN (Oversampling)                                |  0.830   |   0.342   |   0.830   |   0.484   |
 | Random Forest (`max_depth=11`)                    |  0.886   |   0.465   |   0.868   |   0.606   |  
 | SGD (`modified_huber`)                            |  0.887   |   0.241   |   0.048   |   0.081   |  
-| Gradient Boosting (`max_depth=13`, undersampling) |  0.879   |   0.451   | **0.991** |   0.620   |
-| Gradient Boosting (`max_depth=13`, oversampling)  |  0.943   | **0.710** |   0.725   | **0.717** |
+| Gradient Boosting (`max_depth=13`, Undersampling) |  0.879   |   0.451   | **0.991** |   0.620   |
+| Gradient Boosting (`max_depth=13`, Oversampling)  |  0.943   | **0.710** |   0.725   | **0.717** |
 | Stacking                                          |  0.949   | **0.831** |   0.620   | **0.710** |  
 |                                                   |          |           |           |           |
 | Neural Network (Logistic Regression)              |  0.661   |   0.149   |   0.493   |   0.229   |  
@@ -448,7 +448,7 @@ The key findings demonstrate that:
 1. **Binary Classification**:
     - The custom **neural network** (Mish/Hard Shrink activation, Focal Loss) outperformed most of the
       traditional models with an **F1-score** of 0.643, balancing **precision** (0.496) and **recall** (0.916)
-    - **Gradient Boosting** with undersampling achieved the highest `recall** (0.991), making it suitable for minimal
+    - **Gradient Boosting** with undersampling achieved the highest **recall** (0.991), making it suitable for minimal
       false negatives
     - **Gradient Boosting** with oversampling achieved great **precision** and **F1-score**
     - **Stacking** classifier performed the best overall, achieving the highest **precision** and **F1-score**
@@ -459,7 +459,10 @@ The key findings demonstrate that:
     - Class imbalance significantly impacted rare categories (e.g., Cepheids, Cataclysmic), highlighting the need for
       targeted data collection or augmentation
 
-3. **Astronomical Insights**:
+3. **Classification problem**:
+    - 
+
+4. **Astronomical Insights**:
     - Error metrics were critical predictors of variability, correlating with physical changes in stellar brightness
     - The neural network’s sensitivity to initial weights suggests astrophysical variability patterns may require
       careful model initialization
