@@ -130,6 +130,14 @@ maintaining a reasonable **F1-score** (balancing precision and recall) was also 
 |:--------:|:---------:|:------:|:--------:|  
 |  0.828   |   0.364   | 0.920  |  0.522   |
 
+##### K-Nearest Neighbors (no balancing, 7 neighbors, manhattan metric)
+
+| Accuracy | Precision | Recall | F1-score |  
+|:--------:|:---------:|:------:|:--------:|  
+|  0.930   |   0.722   | 0.483  |  0.581   |
+
+![Confusion matrix for KNN](binary_classification/docs/images/cm_knn_nobalancing.png)
+
 ##### K-Nearest Neighbors (oversampling)
 
 ![Confusion matrix for KNN](binary_classification/docs/images/cm_knn.png)
@@ -244,6 +252,7 @@ The full comparison of models is summarized below:
 |:--------------------------------------------------|:--------:|:---------:|:---------:|:---------:|  
 | Logistic Regression                               |  0.607   |   0.136   |   0.547   |   0.218   |
 | SVC                                               |  0.828   |   0.364   |   0.920   |   0.522   |
+| KNN (no balancing, 8 neighbors, manhattan metric) |  0.930   |   0.722   |   0.483   |   0.581   |
 | KNN                                               |  0.830   |   0.342   |   0.830   |   0.484   |
 | Random Forest (`max_depth=11`)                    |  0.886   |   0.465   |   0.868   |   0.606   |  
 | SGD (`modified_huber`)                            |  0.887   |   0.241   |   0.048   |   0.081   |  
