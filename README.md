@@ -3,6 +3,12 @@
 **LumeNN** is an application that addresses the problem of **binary** and **multiclass** classification
 of variable stars using various machine learning models.
 
+Due to development of the app, README documentation might be slightly outdated -
+it might not show all the classifiers available or
+their metrics could not be the best out of all possible configurations possible for them.
+Nevertheless, the research is valid under any circumstances,
+and thus is a valuable part of the whole repository.
+
 ## Relevance of the Study
 
 Given the significant accumulation of astronomical observation data,
@@ -92,7 +98,8 @@ The dataset suffers from class imbalance:
 
 ![Class distribution in the dataset](binary_classification/docs/images/variable_ratio.png)
 
-This issue was addressed during the study using **class weighting** and **undersampling**.
+This issue was addressed during the study using **class weighting**,
+**oversampling** with SMOTE and **undersampling**.
 
 ### Research
 
@@ -115,6 +122,22 @@ maintaining a reasonable **F1-score** (balancing precision and recall) was also 
 |:--------:|:---------:|:------:|:--------:|  
 |  0.607   |   0.136   | 0.547  |  0.218   |
 
+##### SVC (oversampling)
+
+![Confusion matrix for SVC](binary_classification/docs/images/cm_svc.png)
+
+| Accuracy | Precision | Recall | F1-score |  
+|:--------:|:---------:|:------:|:--------:|  
+|  0.828   |   0.364   | 0.920  |  0.522   |
+
+##### K-Nearest Neighbors (oversampling)
+
+![Confusion matrix for KNN](binary_classification/docs/images/cm_knn.png)
+
+| Accuracy | Precision | Recall | F1-score |  
+|:--------:|:---------:|:------:|:--------:|  
+|  0.830   |   0.342   | 0.830  |  0.484   |
+
 ##### Random Forest (`max_depth=11`; Class Weighting)
 
 ![Confusion matrix for random forest](binary_classification/docs/images/cm_random_forest.png)
@@ -133,13 +156,25 @@ maintaining a reasonable **F1-score** (balancing precision and recall) was also 
 
 ##### Gradient Boosting (`max_depth=13`; Undersampling)
 
-![Confusion matrix for gradient boosting](binary_classification/docs/images/cm_gradient_boosting.png)
+![Confusion matrix for gradient boosting](binary_classification/docs/images/cm_gradient_boosting_undersampling.png)
 
 | Accuracy | Precision | Recall | F1-score |  
 |:--------:|:---------:|:------:|:--------:|  
 |  0.879   |   0.451   | 0.991  |  0.620   |  
 
-##### Stacking
+Gradient Boosting shows the best **recall** with undersampling.
+
+##### Gradient Boosting (`max_depth=13`; Oversampling)
+
+![Confusion matrix for gradient boosting](binary_classification/docs/images/cm_gradient_boosting_oversampling.png)
+
+| Accuracy | Precision | Recall | F1-score |  
+|:--------:|:---------:|:------:|:--------:|  
+|  0.943   |   0.710   | 0.725  |  0.717   |
+
+If SMOTE oversampling is applied, Gradient Boosting shows great **precision** and **F1-score**
+
+##### Stacking (`Gradient Boosting` + `Random Forest` + `Logistic Regression`, Class Weighting)
 
 ![Confusion matrix for stacking](binary_classification/docs/images/cm_stacking.png)
 
@@ -205,24 +240,27 @@ and are loaded when running the application.
 
 The full comparison of models is summarized below:
 
-| Model                                | Accuracy | Precision |  Recall   | F1-score  |  
-|:-------------------------------------|:--------:|:---------:|:---------:|:---------:|  
-| Logistic Regression                  |  0.607   |   0.136   |   0.547   |   0.218   |  
-| Random Forest (`max_depth=11`)       |  0.886   |   0.465   |   0.868   |   0.606   |  
-| SGD (`modified_huber`)               |  0.887   |   0.241   |   0.048   |   0.081   |  
-| Gradient Boosting (`max_depth=13`)   |  0.879   |   0.451   | **0.991** |   0.620   |
-| Stacking                             |  0.949   | **0.831** |   0.620   | **0.710** |  
-|                                      |          |           |           |           |
-| Neural Network (Logistic Regression) |  0.661   |   0.149   |   0.493   |   0.229   |  
-| **Neural Network**                   |  0.895   |   0.496   |   0.916   |   0.643   |  
+| Model                                             | Accuracy | Precision |  Recall   | F1-score  |  
+|:--------------------------------------------------|:--------:|:---------:|:---------:|:---------:|  
+| Logistic Regression                               |  0.607   |   0.136   |   0.547   |   0.218   |
+| SVC                                               |  0.828   |   0.364   |   0.920   |   0.522   |
+| KNN                                               |  0.830   |   0.342   |   0.830   |   0.484   |
+| Random Forest (`max_depth=11`)                    |  0.886   |   0.465   |   0.868   |   0.606   |  
+| SGD (`modified_huber`)                            |  0.887   |   0.241   |   0.048   |   0.081   |  
+| Gradient Boosting (`max_depth=13`, undersampling) |  0.879   |   0.451   | **0.991** |   0.620   |
+| Gradient Boosting (`max_depth=13`, oversampling)  |  0.943   | **0.710** |   0.725   | **0.717** |
+| Stacking                                          |  0.949   | **0.831** |   0.620   | **0.710** |  
+|                                                   |          |           |           |           |
+| Neural Network (Logistic Regression)              |  0.661   |   0.149   |   0.493   |   0.229   |  
+| Neural Network                                    |  0.895   |   0.496   |   0.916   |   0.643   |  
 
-Among the `scikit-learn` models, the **Stacking Classifier** performed best overall,
-achieving the highest **precision** and **F1-score**. But **Gradient Boosting Classifier**
-has the best **recall** which is important in our task.
+Among the `scikit-learn` models, the **Stacking Classifier** and **Gradient Boosting Classifier**
+were the best - nice **precision**, **recall** and **F1-score**.
+You should choose the best model for your specific task.
 
 The neural network results are competitive with other classifiers, which should be noted -
 our configuration is fairly simple and so it is possible that different
-highly tuned neural network could outperform  all `scikit-learn` classifiers by a fair amount.
+highly tuned neural network could outperform all `scikit-learn` classifiers by a fair amount.
 
 ## Multiclass Classification
 
@@ -264,8 +302,9 @@ Once again there is class imbalance:
 Although `CEPHEIDS` and `CATACLYSMIC` stars are almost non-existent in dataset,
 it would be a nice challenge to try to classify those correctly.
 
-All models are using balanced class weights, no undersampling is applied
-(there would be no data left after undersampling).
+This issue was addressed during the study using **class weighting**,
+**oversampling** with SMOTE and **undersampling**,
+although in the research we only utilised **class weighting**
 
 ### Research
 
@@ -389,33 +428,38 @@ that makes it the best classifier for multiclass classification.
 We can also pinpoint how well Gradient Boosting and Random Forest classify `CEPHEIDS` and `CATACLYSMIC` stars:
 they are able to recognise those stars even when their amount is very small.
 
-## Conclusion  
+## Conclusion
 
 This research successfully addressed the challenge of classifying variable stars
 through both **binary** (variable/non-variable) and
 **multiclass** (variable type) approaches.
 
-The key findings demonstrate that:  
+The key findings demonstrate that:
 
-1. **Binary Classification**:  
-   - The custom **neural network** (Mish/Hard Shrink activation, Focal Loss) outperformed most of the 
-   traditional models with an `F1-score` of 0.643, balancing `precision` (0.496) and `recall` (0.916)
-   - **Gradient Boosting** achieved the highest `recall` (0.991), making it suitable for minimal false negatives
-   - **Stacking** classifier performed the best overall, achieving the highest **precision** and **F1-score**.
+1. **Binary Classification**:
+    - The custom **neural network** (Mish/Hard Shrink activation, Focal Loss) outperformed most of the
+      traditional models with an **F1-score** of 0.643, balancing **precision** (0.496) and **recall** (0.916)
+    - **Gradient Boosting** with undersampling achieved the highest `recall** (0.991), making it suitable for minimal
+      false negatives
+    - **Gradient Boosting** with oversampling achieved great **precision** and **F1-score**
+    - **Stacking** classifier performed the best overall, achieving the highest **precision** and **F1-score**
 
-2. **Multiclass Classification**:  
-   - **Gradient Boosting** emerged as the best model, achieving weighted `F1-score` = 0.86 and `precision` = 0.85,
-   excelling in identifying common classes (e.g., Delta Scuti) while handling rarer types.
-   - Class imbalance significantly impacted rare categories (e.g., Cepheids, Cataclysmic), highlighting the need for targeted data collection or augmentation
+2. **Multiclass Classification**:
+    - **Gradient Boosting** emerged as the best model, achieving weighted **F1-score** = 0.86 and **precision** = 0.85,
+      excelling in identifying common classes (e.g., Delta Scuti) while handling rarer types.
+    - Class imbalance significantly impacted rare categories (e.g., Cepheids, Cataclysmic), highlighting the need for
+      targeted data collection or augmentation
 
-3. **Astronomical Insights**:  
-   - Error metrics were critical predictors of variability, correlating with physical changes in stellar brightness
-   - The neural network’s sensitivity to initial weights suggests astrophysical variability patterns may require careful model initialization
+3. **Astronomical Insights**:
+    - Error metrics were critical predictors of variability, correlating with physical changes in stellar brightness
+    - The neural network’s sensitivity to initial weights suggests astrophysical variability patterns may require
+      careful model initialization
 
 This work provides a robust framework for automating variable star identification,
 enabling astronomers to focus on high-value targets and accelerate discoveries in stellar astrophysics.
 That, along with interactive component, makes it a great tool for any stellar research.
 
 ## Contributions
+
 Feel free to star this repository if you liked our research or if you are interested in it;
 in case of latter you are also welcome to contact our with your suggestions or questions.
