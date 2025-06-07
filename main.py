@@ -30,10 +30,11 @@ def main(argv: t.List[str]) -> None:
             'SGD' ('5'),
             'gradient boosting' ('6'),
             'stacking' ('7'),
+            'MLP' ('8'),
 
         Neural networks:
-            'neural network that emulates logistic regression' ('8'),
-            'neural network classifier' ('9')\n"""))
+            'neural network that emulates logistic regression' ('9'),
+            'neural network classifier' ('10')\n"""))
             if classifier_id == 1:
                 classifier = bc.LOGISTIC_REGRESSION_CLASSIFIER
             elif classifier_id == 2:
@@ -49,8 +50,10 @@ def main(argv: t.List[str]) -> None:
             elif classifier_id == 7:
                 classifier = bc.STACKING_CLASSIFIER
             elif classifier_id == 8:
-                classifier = bc.NN_LOGISTIC_REGRESSION_CLASSIFIER
+                classifier = bc.MLP_CLASSIFIER
             elif classifier_id == 9:
+                classifier = bc.NN_LOGISTIC_REGRESSION_CLASSIFIER
+            elif classifier_id == 10:
                 classifier = bc.NN_CLASSIFIER
                 classifier.classifier = keras.models.load_model("datasets/best_weights.keras")
             else:
@@ -84,14 +87,16 @@ def main(argv: t.List[str]) -> None:
         elif classification_type == "m":
             print()
             classifier_id = int(input(
-                """`LumeNN` offers following classifiers for multiclass classification:
+                """`LumeNN` offers following classifiers for binary classification:
         `sklearn` models:
             'logistic regression' ('1'),
             'SVC' ('2'),
             'KNN' ('3'),
             'random forest' ('4'),
             'SGD' ('5'),
-            'gradient boosting' ('6')\n"""))
+            'gradient boosting' ('6'),
+            'stacking' ('7'),
+            'MLP' ('8')\n"""))
             if classifier_id == 1:
                 classifier = mc.LOGISTIC_REGRESSION_CLASSIFIER
             elif classifier_id == 2:
@@ -104,6 +109,10 @@ def main(argv: t.List[str]) -> None:
                 classifier = mc.SGD_CLASSIFIER
             elif classifier_id == 6:
                 classifier = mc.GRADIENT_BOOSTING_CLASSIFIER
+            elif classifier_id == 7:
+                classifier = mc.STACKING_CLASSIFIER
+            elif classifier_id == 8:
+                classifier = mc.MLP_CLASSIFIER
             else:
                 print("Wrong input - there is no classifier with code " + str(classifier_id))
                 continue

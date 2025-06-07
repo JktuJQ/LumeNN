@@ -10,6 +10,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import StackingClassifier
+from sklearn.neural_network import MLPClassifier
 
 
 LOGISTIC_REGRESSION_CLASSIFIER = LogisticRegression(class_weight="balanced")
@@ -22,6 +23,14 @@ STACKING_CLASSIFIER = StackingClassifier(estimators=[
     ("gradient boosting", GRADIENT_BOOSTING_CLASSIFIER),
     ("random forest", RANDOM_FOREST_CLASSIFIER)
 ], final_estimator=LogisticRegression())
+MLP_CLASSIFIER = MLPClassifier(
+    hidden_layer_sizes=(100, 50, 20, 10),
+    activation="tanh",
+    solver="adam",
+    max_iter=250,
+    learning_rate_init=0.005,
+    batch_size=64
+)
 
 
 class NNClassifier:
