@@ -72,7 +72,8 @@ def main(argv: t.List[str]) -> None:
 
             print()
             balancing_method = int(input(
-                "Choose balancing method: 'oversampling' ('1'), 'undersampling' ('2') or 'class balancing' ('3')\n"))
+                """Choose balancing method: 'oversampling' ('1'), 'undersampling' ('2') or 'class balancing' ('3')
+Note: class balancing does not work on KNN, Gradient Boosting, Stacking and MLP - it simply does nothing.\n"""))
             if balancing_method == 1:
                 train_data = common.oversample(*train_data)
             elif balancing_method == 2:

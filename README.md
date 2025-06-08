@@ -192,6 +192,14 @@ If SMOTE oversampling is applied, Gradient Boosting shows great **precision** an
 
 It works well but fitting takes extremely long time.
 
+##### Multi-layer Perceptron (`hidden_layer_sizes=(100, 50, 20, 10), activation="tanh"`; No balancing)
+
+![Confusion matrix for MLP](binary_classification/docs/images/cm_mlp.png)
+
+| Accuracy | Precision | Recall | F1-score |  
+|:--------:|:---------:|:------:|:--------:|  
+|  0.955   |   0.819   | 0.737  |  0.776   |
+
 #### Neural Networks
 
 ##### Neural Network Emulating Logistic Regression (Class Weighting)
@@ -257,19 +265,21 @@ The full comparison of models is summarized below:
 | Random Forest (`max_depth=11`)                    |  0.886   |   0.465   |   0.868   |   0.606   |  
 | SGD (`modified_huber`)                            |  0.887   |   0.241   |   0.048   |   0.081   |  
 | Gradient Boosting (`max_depth=13`, Undersampling) |  0.879   |   0.451   | **0.991** |   0.620   |
-| Gradient Boosting (`max_depth=13`, Oversampling)  |  0.943   | **0.710** |   0.725   | **0.717** |
-| Stacking                                          |  0.949   | **0.831** |   0.620   | **0.710** |  
+| Gradient Boosting (`max_depth=13`, Oversampling)  |  0.943   |   0.710   |   0.725   |   0.717   |
+| Stacking                                          |  0.949   | **0.831** |   0.620   |   0.710   |  
+| MLP                                               |  0.955   |   0.819   |   0.737   | **0.776** |
 |                                                   |          |           |           |           |
 | Neural Network (Logistic Regression)              |  0.661   |   0.149   |   0.493   |   0.229   |  
 | Neural Network                                    |  0.895   |   0.496   |   0.916   |   0.643   |  
 
-Among the `scikit-learn` models, the **Stacking Classifier** and **Gradient Boosting Classifier**
-were the best - nice **precision**, **recall** and **F1-score**.
-You should choose the best model for your specific task.
+Among the `scikit-learn` models, the **Stacking classifier**, **Gradient Boosting classifier** and **MLP classifier**
+were the best in **precision**, **recall** and **F1-score** respectively.
 
 The neural network results are competitive with other classifiers, which should be noted -
 our configuration is fairly simple and so it is possible that different
 highly tuned neural network could outperform all `scikit-learn` classifiers by a fair amount.
+That hypothesis is even more supported by the fact that **MLP classifier** is arguably the best out of all classifiers
+overall.
 
 ## Multiclass Classification
 
@@ -446,26 +456,23 @@ through both **binary** (variable/non-variable) and
 The key findings demonstrate that:
 
 1. **Binary Classification**:
-    - The custom **neural network** (Mish/Hard Shrink activation, Focal Loss) outperformed most of the
-      traditional models with an **F1-score** of 0.643, balancing **precision** (0.496) and **recall** (0.916)
-    - **Gradient Boosting** with undersampling achieved the highest **recall** (0.991), making it suitable for minimal
-      false negatives
-    - **Gradient Boosting** with oversampling achieved great **precision** and **F1-score**
-    - **Stacking** classifier performed the best overall, achieving the highest **precision** and **F1-score**
+    - **Gradient Boosting** with undersampling achieved the highest **recall** (0.991)
+    - **Stacking** with oversampling achieved the best **precision** (0.831)
+    - **MLP** classifier with no balancing achieved the best **F1-score** (0.776)
+    - **MLP** classifier performed the best overall
 
 2. **Multiclass Classification**:
     - **Gradient Boosting** emerged as the best model, achieving weighted **F1-score** = 0.86 and **precision** = 0.85,
-      excelling in identifying common classes (e.g., Delta Scuti) while handling rarer types.
+      excelling in identifying common classes (e.g., Delta Scuti) while handling rarer types
     - Class imbalance significantly impacted rare categories (e.g., Cepheids, Cataclysmic), highlighting the need for
       targeted data collection or augmentation
 
-3. **Classification problem**:
-    - 
-
-4. **Astronomical Insights**:
+3. **AClassification Insights**:
     - Error metrics were critical predictors of variability, correlating with physical changes in stellar brightness
     - The neural network’s sensitivity to initial weights suggests astrophysical variability patterns may require
       careful model initialization
+    - The neural networks could be the best tools for classification - simple neural network and MLP classifiers
+      showed promising results even though they weren't tightly configured using optimization frameworks
 
 This work provides a robust framework for automating variable star identification,
 enabling astronomers to focus on high-value targets and accelerate discoveries in stellar astrophysics.
