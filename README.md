@@ -467,7 +467,7 @@ The key findings demonstrate that:
     - Class imbalance significantly impacted rare categories (e.g., Cepheids, Cataclysmic), highlighting the need for
       targeted data collection or augmentation
 
-3. **AClassification Insights**:
+3. **Classification Insights**:
     - Error metrics were critical predictors of variability, correlating with physical changes in stellar brightness
     - The neural network’s sensitivity to initial weights suggests astrophysical variability patterns may require
       careful model initialization
